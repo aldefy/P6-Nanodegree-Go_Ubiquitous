@@ -1,0 +1,26 @@
+<RadioGroup
+    android:id="@+id/unitGroup"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RadioButton
+        android:id="@+id/unit1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:drawablePadding="20dp"
+        android:textColor="@color/primary_text"
+        />
+
+    <RadioButton
+        android:id="@+id/unit2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawablePadding="50dp"
+        android:textColor="@color/primary_text"
+        />
+</RadioGroup>

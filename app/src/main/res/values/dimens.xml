@@ -1,0 +1,10 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="list_icon">40dp</dimen>
+    <dimen name="forecast_text_width">64dp</dimen>
+    <dimen name="forecast_temperature_space">8dp</dimen>
+    <dimen name="forecast_text_size">24dp</dimen>
+</resources>

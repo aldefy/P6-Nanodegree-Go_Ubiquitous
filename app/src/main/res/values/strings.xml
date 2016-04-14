@@ -1,0 +1,27 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <string name="app_name">Sunshine</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_text">Hit Me!!</string>
+    <string name="hello">Hello World!</string>
+    <string name="second">Second</string>
+    <string name="weather_category">Weather Settings</string>
+    <string name="weather_notification_checkbox_heading">Weather Notifications</string>
+    <string name="weather_notification_checkbox_summary">Weather updates</string>
+    <string name="weather_units_heading">Temperature Units</string>
+    <string name="weather_location_heading">Location</string>
+    <string name="myLocation_gps">mylocation_gps</string>
+    <string name="weather_icon_heading">Icon Pack</string>
+
+    <string name="value_location_metric">Set a Location</string>
+    <string name="value_icon_metric">Default pack</string>
+    <string name="value_units_metric">Metric</string>
+    <string name="value_units_imperial">Imperial</string>
+    <string name="icon_pack_heading">Weather icon packs</string>
+
+    <string name="icon_pack_meteoconcs" translatable="false">Meteoconcs Pack</string>
+    <string name="icon_pack_default" translatable="false">Default Pack</string>
+
+    <string name="format_temperature"><xliff:g mId="temp">%1.0f</xliff:g></string>
+
+
+</resources>

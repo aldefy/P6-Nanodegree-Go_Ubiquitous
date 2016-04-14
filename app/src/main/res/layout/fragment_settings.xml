@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weatherSettingsHeader"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="@string/weather_category"
+            android:textColor="@color/accent"/>
+
+        <RelativeLayout android:id="@+id/weather_settings_option1"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/weatherSettingsHeader"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:padding="16dp">
+
+
+            <CheckBox
+                android:id="@+id/weather_notifications_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="false"/>
+
+
+            <TextView
+                android:id="@+id/weather_notifications_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/weather_notifications_checkbox"
+                android:text="@string/weather_notification_checkbox_heading"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"/>
+
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/weather_settings_option1"
+            android:background="@color/grey_500"/>
+
+        <RelativeLayout android:id="@+id/weather_settings_option2"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/divider1"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:padding="16dp">
+
+
+            <TextView
+                android:id="@+id/temperature_units_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="@string/weather_units_heading"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/temperature_units_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/temperature_units_heading"
+                android:paddingTop="4dp"
+                android:text="@string/value_units_metric"
+                android:textSize="16sp"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/weather_settings_option2"
+            android:background="@color/grey_500"/>
+
+        <RelativeLayout android:id="@+id/weather_settings_option3"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/divider2"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:paddingBottom="16dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="2dp"
+                        android:paddingTop="16dp">
+
+
+            <TextView
+                android:id="@+id/weather_location_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/gpsLocationButton"
+                android:text="@string/weather_location_heading"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/weather_location_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weather_location_heading"
+                android:layout_toStartOf="@+id/gpsLocationButton"
+                android:paddingTop="4dp"
+                android:text="@string/value_location_metric"
+                android:textSize="16sp"/>
+
+            <ImageButton
+                android:id="@+id/gpsLocationButton"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:background="@color/transparent"
+                android:contentDescription="@string/myLocation_gps"
+                android:padding="8dp"
+                android:src="@drawable/ic_my_location"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/weather_settings_option3"
+            android:background="@color/grey_500"/>
+
+        <RelativeLayout android:id="@+id/weather_settings_option4"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/divider3"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:paddingBottom="16dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="2dp"
+                        android:paddingTop="16dp">
+
+
+            <TextView
+                android:id="@+id/weather_icon_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/weather_icon_image"
+                android:text="@string/weather_icon_heading"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/weather_icon_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weather_icon_heading"
+                android:layout_toStartOf="@+id/weather_icon_image"
+                android:paddingTop="4dp"
+                android:text="@string/value_icon_metric"
+                android:textSize="16sp"/>
+
+            <ImageButton
+                android:id="@+id/weather_icon_image"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:background="@color/transparent"
+                android:contentDescription="@string/myLocation_gps"
+                android:padding="8dp"
+                android:src="@drawable/ic_my_location"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/weather_settings_option4"
+            android:background="@color/grey_500"/>
+    </RelativeLayout>
+</android.support.v4.widget.NestedScrollView>
