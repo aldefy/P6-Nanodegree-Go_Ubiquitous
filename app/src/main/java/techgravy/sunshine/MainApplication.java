@@ -19,9 +19,8 @@ import techgravy.sunshine.models.WeatherForecastCity;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.module.PrefModule;
+import techgravy.sunshine.utils.LoggerTree;
 import techgravy.sunshine.utils.PreferenceManager;
-import techgravy.sunshine.utils.logger.LogLevel;
-import techgravy.sunshine.utils.logger.Logger;
 import timber.log.Timber;
 
 /**
@@ -41,19 +40,8 @@ public class MainApplication extends Application {
     }
 
     private void init() {
-        Logger.init("Sunshine").methodOffset(3).logLevel(LogLevel.FULL);
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.Tree() {
-                @Override
-                protected void log(int priority, String tag, String message, Throwable t) {
-                    Logger.t(tag);
-                    if (t != null)
-                        Logger.e(t, message);
-                    else
-                        Logger.d(message);
-
-                }
-            });
+            Timber.plant(new LoggerTree());
             Timber.tag("Sunshine");
         }
         moduleComponent = DaggerModuleComponent.builder()

@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
+import timber.log.Timber;
 
 /**
  * Created by aditlal on 06/04/16.
@@ -32,6 +33,13 @@ public class ApiGenerator {
 
         RestAdapter.Builder builder = new RestAdapter.Builder()
                 .setEndpoint(BASE_URL)
+                .setLog(new RestAdapter.Log() {
+                    @Override
+                    public void log(String message) {
+                        Timber.tag("RetroFit");
+                        Timber.d(message);
+                    }
+                })
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setClient(new OkClient(okHttpClient));
 

@@ -110,12 +110,13 @@ public class WeatherWeekFragment extends Fragment {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error , fetching from server");
-                swipeRefresh.setRefreshing(false);
-                // fetchWeatherFromServer();
+                swipeRefresh.setRefreshing(true);
+                fetchWeatherFromServer();
             }
 
             @Override
             public void onNext(WeatherResponse weatherResponse) {
+                Timber.d(weatherResponse.toString());
                 forecastList.clear();
                 forecastList.addAll(weatherResponse.getList());
                 adapter.notifyDataSetChanged();

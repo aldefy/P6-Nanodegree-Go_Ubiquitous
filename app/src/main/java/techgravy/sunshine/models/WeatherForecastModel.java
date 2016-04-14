@@ -7,17 +7,19 @@ import java.util.List;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushCallback;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.annotations.RushList;
 
 /**
  * Created by aditlal on 06/04/16.
  */
-public class WeatherForecastModel implements Rush{
+public class WeatherForecastModel implements Rush {
 
     @SerializedName("clouds")
     private double clouds;
 
     @SerializedName("dt")
     private String dt;
+
     @SerializedName("humidity")
     private double humidity;
 
@@ -30,6 +32,8 @@ public class WeatherForecastModel implements Rush{
     @SerializedName("deg")
     private double deg;
 
+    @RushList(classType = Weather.class)
+    @SerializedName("weather")
     private List<Weather> weather;
 
     private Temperature temp;
@@ -105,14 +109,28 @@ public class WeatherForecastModel implements Rush{
     }
 
     @Override
-    public void save() { RushCore.getInstance().save(this); }
+    public void save() {
+        RushCore.getInstance().save(this);
+    }
+
     @Override
-    public void save(RushCallback callback) { RushCore.getInstance().save(this, callback); }
+    public void save(RushCallback callback) {
+        RushCore.getInstance().save(this, callback);
+    }
+
     @Override
-    public void delete() { RushCore.getInstance().delete(this); }
+    public void delete() {
+        RushCore.getInstance().delete(this);
+    }
+
     @Override
-    public void delete(RushCallback callback) { RushCore.getInstance().delete(this, callback); }
+    public void delete(RushCallback callback) {
+        RushCore.getInstance().delete(this, callback);
+    }
+
     @Override
-    public String getId() { return RushCore.getInstance().getId(this); }
+    public String getId() {
+        return RushCore.getInstance().getId(this);
+    }
 
 }
