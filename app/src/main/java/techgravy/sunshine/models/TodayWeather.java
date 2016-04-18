@@ -1,8 +1,5 @@
 package techgravy.sunshine.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 
 import co.uk.rushorm.core.Rush;
@@ -12,7 +9,7 @@ import co.uk.rushorm.core.RushCore;
 /**
  * Created by aditlal on 06/04/16.
  */
-public class Weather implements Rush, Parcelable {
+public class TodayWeather implements Rush {
 
     @SerializedName("id")
     private int mId;
@@ -84,39 +81,4 @@ public class Weather implements Rush, Parcelable {
     public String getId() {
         return RushCore.getInstance().getId(this);
     }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mId);
-        dest.writeString(icon);
-        dest.writeString(description);
-        dest.writeString(main);
-    }
-
-    // Creator
-    public static final Parcelable.Creator<Weather> CREATOR
-            = new Parcelable.Creator<Weather>() {
-        public Weather createFromParcel(Parcel in) {
-            return new Weather(in);
-        }
-
-        public Weather[] newArray(int size) {
-            return new Weather[size];
-        }
-    };
-
-    // "De-parcel object
-    public Weather(Parcel in) {
-        mId = in.readInt();
-        icon = in.readString();
-        description = in.readString();
-        main = in.readString();
-    }
-
 }

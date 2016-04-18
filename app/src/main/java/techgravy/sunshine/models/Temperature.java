@@ -1,15 +1,19 @@
 package techgravy.sunshine.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushCallback;
 import co.uk.rushorm.core.RushCore;
+import timber.log.Timber;
 
 /**
  * Created by aditlal on 13/04/16.
  */
-public class Temperature implements Rush {
+public class Temperature implements Rush, Parcelable {
     @SerializedName("min")
     private float min;
     @SerializedName("eve")
@@ -77,14 +81,67 @@ public class Temperature implements Rush {
     }
 
     @Override
-    public void save() { RushCore.getInstance().save(this); }
+    public void save() {
+        Timber.tag("RushSave").d(toString());
+        RushCore.getInstance().save(this);
+    }
+
     @Override
-    public void save(RushCallback callback) { RushCore.getInstance().save(this, callback); }
+    public void save(RushCallback callback) {
+        RushCore.getInstance().save(this, callback);
+    }
+
     @Override
-    public void delete() { RushCore.getInstance().delete(this); }
+    public void delete() {
+        RushCore.getInstance().delete(this);
+    }
+
     @Override
-    public void delete(RushCallback callback) { RushCore.getInstance().delete(this, callback); }
+    public void delete(RushCallback callback) {
+        RushCore.getInstance().delete(this, callback);
+    }
+
     @Override
-    public String getId() { return RushCore.getInstance().getId(this); }
+    public String getId() {
+        return RushCore.getInstance().getId(this);
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeFloat(min);
+        dest.writeFloat(max);
+        dest.writeFloat(morn);
+        dest.writeFloat(day);
+        dest.writeFloat(eve);
+        dest.writeFloat(night);
+    }
+
+    // Creator
+    public static final Parcelable.Creator<Temperature> CREATOR
+            = new Parcelable.Creator<Temperature>() {
+        public Temperature createFromParcel(Parcel in) {
+            return new Temperature(in);
+        }
+
+        public Temperature[] newArray(int size) {
+            return new Temperature[size];
+        }
+    };
+
+    // "De-parcel object
+    public Temperature(Parcel in) {
+        min = in.readFloat();
+        max = in.readFloat();
+        morn = in.readFloat();
+        day = in.readFloat();
+        eve = in.readFloat();
+        night = in.readFloat();
+    }
 
 }

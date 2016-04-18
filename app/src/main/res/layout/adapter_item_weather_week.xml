@@ -3,12 +3,12 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:background="?android:attr/selectableItemBackground"
+              android:clickable="true"
+              android:focusable="true"
               android:gravity="center_vertical"
               android:minHeight="?android:attr/listPreferredItemHeight"
               android:orientation="horizontal"
-              android:clickable="true"
-              android:focusable="true"
-              android:background="?android:attr/selectableItemBackground"
               android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
               android:paddingRight="@dimen/abc_list_item_padding_horizontal_material">
 
@@ -17,15 +17,16 @@
         android:layout_width="@dimen/list_icon"
         android:layout_height="@dimen/list_icon"
         android:layout_gravity="center"
-        android:clickable="false"
         android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"
         android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"
+        android:clickable="false"
         tools:src="@drawable/ic_my_location"/>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="7"
+        tools:background="@color/grey_500"
         android:orientation="vertical">
 
         <TextView
@@ -33,14 +34,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/white"
             tools:text="Date"/>
 
         <TextView
             android:id="@+id/list_item_forecast_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:alpha="45"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/secondary_text"
+            android:textColor="@color/white"
             tools:text="Forecast"/>
     </LinearLayout>
 
@@ -50,10 +53,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginEnd="@dimen/forecast_temperature_space"
+        tools:background="@color/primary_dark"
         android:layout_marginRight="@dimen/forecast_temperature_space"
         android:fontFamily="sans-serif-light"
         android:gravity="right"
-        android:textColor="@color/primary_text"
+        android:textColor="@color/forecast_high"
         android:textSize="@dimen/forecast_text_size"
         tools:text="16"/>
 
@@ -64,7 +68,7 @@
         android:layout_gravity="center"
         android:fontFamily="sans-serif-light"
         android:gravity="right"
-        android:textColor="@color/forecast_low_text"
+        android:textColor="@color/forecast_low"
         android:textSize="@dimen/forecast_text_size"
         tools:text="20"/>
 

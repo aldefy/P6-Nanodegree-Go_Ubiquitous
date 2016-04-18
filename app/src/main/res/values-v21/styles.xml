@@ -10,7 +10,7 @@
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:icon">@color/icons</item>
         <item name="android:divider">@color/divider</item>
-        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>

@@ -10,6 +10,7 @@ import java.util.List;
 import co.uk.rushorm.android.AndroidInitializeConfig;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushCore;
+import rx.Subscriber;
 import techgravy.sunshine.interfaces.DaggerModuleComponent;
 import techgravy.sunshine.interfaces.ModuleComponent;
 import techgravy.sunshine.models.Coord;
@@ -17,6 +18,7 @@ import techgravy.sunshine.models.Temperature;
 import techgravy.sunshine.models.Weather;
 import techgravy.sunshine.models.WeatherForecastCity;
 import techgravy.sunshine.models.WeatherForecastModel;
+import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.module.PrefModule;
 import techgravy.sunshine.utils.LoggerTree;
@@ -32,6 +34,7 @@ public class MainApplication extends Application {
     public ModuleComponent moduleComponent;
     PreferenceManager preferenceManager;
     public static MainApplication application;
+    private Subscriber<WeatherHeaderModel> subscriber;
 
     @Override
     public void onCreate() {
@@ -52,7 +55,6 @@ public class MainApplication extends Application {
         application = this;
         Picasso.Builder builder = new Picasso.Builder(this);
         Picasso built = builder.build();
-        built.setIndicatorsEnabled(true);
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
         initializeDB();
@@ -78,5 +80,13 @@ public class MainApplication extends Application {
 
     public PreferenceManager getPreferenceManager() {
         return preferenceManager;
+    }
+
+    public Subscriber<WeatherHeaderModel> getSubscriber() {
+        return subscriber;
+    }
+
+    public void setSubscriber(Subscriber<WeatherHeaderModel> subscriber) {
+        this.subscriber = subscriber;
     }
 }

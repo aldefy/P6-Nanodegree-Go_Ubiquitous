@@ -100,13 +100,13 @@ public class SettingFragment extends Fragment {
             iconPackValueTextView.setText(icon_default);
             weatherIconImage.setImageDrawable(new IconicsDrawable(getActivity())
                     .icon(WeatherIcons.Icon.wic_day_sunny)
-                    .color(ContextCompat.getColor(getActivity(), R.color.grey_500))
+                    .color(ContextCompat.getColor(getActivity(), R.color.white))
                     .sizeDp(24));
         } else {
             iconPackValueTextView.setText(icon_meteoconcs);
             weatherIconImage.setImageDrawable(new IconicsDrawable(getActivity())
                     .icon(Meteoconcs.Icon.met_sun)
-                    .color(ContextCompat.getColor(getActivity(), R.color.grey_500))
+                    .color(ContextCompat.getColor(getActivity(), R.color.white))
                     .sizeDp(24));
         }
         return rootView;
@@ -171,10 +171,9 @@ public class SettingFragment extends Fragment {
                 iconPackValueTextView.setText(icon_default);
                 weatherIconImage.setImageDrawable(new IconicsDrawable(getActivity())
                         .icon(WeatherIcons.Icon.wic_day_sunny)
-                        .color(ContextCompat.getColor(getActivity(), R.color.grey_500))
+                        .color(ContextCompat.getColor(getActivity(), R.color.white))
                         .sizeDp(24));
                 settingsRefreshInterface.refreshIconPack();
-
             }
         } else {
             if (type == tempUnitType) {
@@ -187,7 +186,7 @@ public class SettingFragment extends Fragment {
                 iconPackValueTextView.setText(icon_meteoconcs);
                 weatherIconImage.setImageDrawable(new IconicsDrawable(getActivity())
                         .icon(Meteoconcs.Icon.met_sun)
-                        .color(ContextCompat.getColor(getActivity(), R.color.grey_500))
+                        .color(ContextCompat.getColor(getActivity(), R.color.white))
                         .sizeDp(24));
                 settingsRefreshInterface.refreshIconPack();
 

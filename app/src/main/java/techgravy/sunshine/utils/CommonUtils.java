@@ -1,13 +1,16 @@
 package techgravy.sunshine.utils;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -17,6 +20,7 @@ import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 
 import techgravy.sunshine.R;
 import timber.log.Timber;
@@ -28,6 +32,12 @@ public class CommonUtils {
 
     public final static String ICON_PACK_METEOCONCS = "Meteoconcs Pack";
     public final static String ICON_PACK_DEFAULT = "Default Pack";
+    public final static int TIME_MORNING = 1;
+    public final static int TIME_DAY = 2;
+    public final static int TIME_EVE = 3;
+    public final static int TIME_NIGHT = 4;
+    public final static int TIME_UNKNOWN = 5;
+    public final static String LIST_SAVE_INSTANCE ="forecast_list_instance";
 
 
     public static Snackbar displaySnackBar(View view, String message) {
@@ -242,7 +252,7 @@ public class CommonUtils {
             default:
                 return new IconicsDrawable(context)
                         .icon(Meteoconcs.Icon.met_temperature)
-                        .color(ContextCompat.getColor(context, R.color.grey_500))
+                        .color(ContextCompat.getColor(context, R.color.white))
                         .sizeDp(24);
         }
     }
@@ -251,62 +261,62 @@ public class CommonUtils {
         if (weatherId >= 200 && weatherId <= 232) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_storm_warning)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 300 && weatherId <= 321) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_rain)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 500 && weatherId <= 504) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_rain)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId == 511) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_snow)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 520 && weatherId <= 531) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_rain)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 600 && weatherId <= 622) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_forecast_io_snow)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 701 && weatherId <= 761) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_fog)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId == 761 || weatherId == 781) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_storm_warning)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId == 800) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_day_sunny_overcast)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId == 801) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_cloudy_windy)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 802 && weatherId <= 804) {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_cloudy)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else {
             return new IconicsDrawable(context)
                     .icon(WeatherIcons.Icon.wic_thermometer)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         }
     }
@@ -315,62 +325,62 @@ public class CommonUtils {
         if (weatherId >= 200 && weatherId <= 232) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_cloud_flash)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 300 && weatherId <= 321) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_rain_inv)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 500 && weatherId <= 504) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_rain)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
-        }  else if (weatherId == 511) {
+        } else if (weatherId == 511) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_snow)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 520 && weatherId <= 531) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_rain)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 600 && weatherId <= 622) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_snow_heavy)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 701 && weatherId <= 761) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_fog)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId == 761 || weatherId == 781) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_cloud_flash_alt)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId == 800) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_sun)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
-        }else if (weatherId == 801) {
+        } else if (weatherId == 801) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_sun_inv)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else if (weatherId >= 802 && weatherId <= 804) {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_cloud)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         } else {
             return new IconicsDrawable(context)
                     .icon(Meteoconcs.Icon.met_compass)
-                    .color(ContextCompat.getColor(context, R.color.grey_500))
+                    .color(ContextCompat.getColor(context, R.color.white))
                     .sizeDp(24);
         }
 
@@ -388,14 +398,13 @@ public class CommonUtils {
 
         // For presentation, assume the user doesn't care about tenths of a degree.
         String returnedString = String.format(context.getString(R.string.format_temperature), temperature);
-        if(!isMetric.equalsIgnoreCase(context.getString(R.string.value_units_metric))){
-            returnedString= returnedString.concat(" \u2109");//F
-        }
-        else{
-            returnedString= returnedString.concat(" \u2103");//C
+        if (!isMetric.equalsIgnoreCase(context.getString(R.string.value_units_metric))) {
+            returnedString = returnedString.concat(" \u2109");//F
+        } else {
+            returnedString = returnedString.concat(" \u2103");//C
 
         }
-        Timber.d("temperature="+ temperature+"->"+returnedString);
+        Timber.d("temperature=" + temperature + "->" + returnedString);
         return returnedString;
     }
 
@@ -435,4 +444,89 @@ public class CommonUtils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
+    public static String getFormattedWind(Context context, String isMetric, float windSpeed, float degrees) {
+        int windFormat;
+        if (!isMetric.equalsIgnoreCase(context.getString(R.string.value_units_metric))) {
+            windFormat = R.string.format_wind_kmh;
+        } else {
+            windFormat = R.string.format_wind_mph;
+            windSpeed = .621371192237334f * windSpeed;
+        }
+
+        // From wind direction in degrees, determine compass direction as a string (e.g NW)
+        // You know what's fun, writing really long if/else statements with tons of possible
+        // conditions.  Seriously, try it!
+        String direction = "Unknown";
+        if (degrees >= 337.5 || degrees < 22.5) {
+            direction = "N";
+        } else if (degrees >= 22.5 && degrees < 67.5) {
+            direction = "NE";
+        } else if (degrees >= 67.5 && degrees < 112.5) {
+            direction = "E";
+        } else if (degrees >= 112.5 && degrees < 157.5) {
+            direction = "SE";
+        } else if (degrees >= 157.5 && degrees < 202.5) {
+            direction = "S";
+        } else if (degrees >= 202.5 && degrees < 247.5) {
+            direction = "SW";
+        } else if (degrees >= 247.5 && degrees < 292.5) {
+            direction = "W";
+        } else if (degrees >= 292.5 && degrees < 337.5) {
+            direction = "NW";
+        }
+        return String.format(context.getString(windFormat), windSpeed, direction);
+    }
+
+    public static void setTranslucentStatusBar(Window window, @ColorInt int color) {
+        if (window == null) return;
+        int sdkInt = Build.VERSION.SDK_INT;
+        if (sdkInt >= Build.VERSION_CODES.LOLLIPOP) {
+            setTranslucentStatusBarLollipop(window, color);
+        } else if (sdkInt >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatusBarKiKat(window);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static void setTranslucentStatusBarLollipop(Window window, @ColorInt int color) {
+        if (color == -1)
+            window.setStatusBarColor(
+                    ContextCompat.getColor(window.getContext(), R.color.primary_dark));
+        else
+            window.setStatusBarColor(color);
+        Timber.tag("StatusBar").d(color + "");
+
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private static void setTranslucentStatusBarKiKat(Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    }
+
+    // A method to find height of the status bar
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    public static int calculateTimeOfDay() {
+        LocalDateTime now = new LocalDateTime();
+
+        if (now.getHourOfDay() > 0 && now.getHourOfDay() < 11) {
+            return TIME_MORNING;
+        } else if (now.getHourOfDay() >= 11 && now.getHourOfDay() < 18) {
+            return TIME_DAY;
+        } else if (now.getHourOfDay() >= 18 && now.getHourOfDay() < 20) {
+            return TIME_EVE;
+        } else if (now.getHourOfDay() >= 20 && now.getHourOfDay() < 11) {
+            return TIME_NIGHT;
+        } else {
+            return TIME_UNKNOWN;
+        }
+    }
 }

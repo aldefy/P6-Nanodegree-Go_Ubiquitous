@@ -12,7 +12,7 @@ import timber.log.Timber;
 public class LoggerTree extends Timber.Tree {
 
     public LoggerTree() {
-        Logger.init("Sunshine").methodCount(4).methodOffset(5).logLevel(LogLevel.FULL);
+        Logger.init("Sunshine").methodOffset(3).methodCount(4).logLevel(LogLevel.FULL);
 
     }
 

@@ -1,0 +1,362 @@
+<android.support.v4.widget.NestedScrollView android:id="@+id/nestedScrollView"
+                                            xmlns:android="http://schemas.android.com/apk/res/android"
+                                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                                            xmlns:tools="http://schemas.android.com/tools"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:background="@color/windowBackground"
+                                            app:layout_collapseMode="parallax"
+                                            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/aboutImageBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/coverimage"
+            android:scaleType="fitXY"
+            tools:src="@color/grey_500"/>
+
+        <View
+            android:id="@+id/alphaView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#66000000"
+            />
+
+        <TextView
+            android:id="@+id/weatherCityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherHeadlineTextView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="16dp"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:visibility="gone"
+            tools:text="Bengaluru"/>
+
+        <TextView
+            android:id="@+id/weatherDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            tools:text="Tomorrow"/>
+
+        <TextView
+            android:id="@+id/weatherHeadlineTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherDateTextView"
+            android:layout_centerHorizontal="true"
+            android:text="--"
+            android:textColor="@color/white"
+            android:textSize="48sp"/>
+
+        <TextView
+            android:id="@+id/weatherSubHeadTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherCityTextView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="8dp"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            tools:text="Sunny Day"/>
+
+        <TextView
+            android:id="@+id/temperatureHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherSubHeadTextView"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+
+            android:layout_marginTop="16dp"
+            android:text="@string/temperature_heading"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="@color/white"/>
+
+        <View
+            android:id="@+id/tempDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/temperatureHeading"
+            android:layout_margin="16dp"
+            android:background="@color/white"/>
+
+        <LinearLayout
+            android:id="@+id/weatherTemperatureLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tempDivider"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:background="@color/accent">
+
+                <TextView
+                    android:id="@+id/morningTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Morning"
+                    android:textColor="@color/white"/>
+
+
+                <TextView
+                    android:id="@+id/morningTimeTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:text="32 deg"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:background="@color/accent">
+
+                <TextView
+                    android:id="@+id/afternoonTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Afternoon"
+                    android:textColor="@color/white"/>
+
+
+                <TextView
+                    android:id="@+id/afternoonTimeTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:text="32 deg"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:background="@color/accent">
+
+                <TextView
+                    android:id="@+id/eveningTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Evening"
+                    android:textColor="@color/white"
+                    />
+
+
+                <TextView
+                    android:id="@+id/eveningTimeTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:text="32 deg"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:background="@color/accent">
+
+                <TextView
+                    android:id="@+id/nightTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Night"
+                    android:textColor="@color/white"
+                    />
+
+
+                <TextView
+                    android:id="@+id/nightTimeTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="--"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:text="32 deg"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/othersHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherTemperatureLayout"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/other_heading"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="@color/white"/>
+
+        <View
+            android:id="@+id/otherDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/othersHeading"
+            android:layout_margin="16dp"
+            android:background="@color/white"/>
+
+        <LinearLayout
+            android:id="@+id/weatherHumidityDetailsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/otherDivider"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/weatherHumidityTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:text="@string/humidity_title"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+
+            <TextView
+                android:id="@+id/weatherHumidityValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weatherSubHeadTextView"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_toRightOf="@+id/weatherHumidityTitleTextView"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="--"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="35 %"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/weatherPressureDetailsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherHumidityDetailsLayout"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/weatherPressureTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/weatherSubHeadTextView"
+                android:layout_weight="1"
+                android:text="@string/pressure_title"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+
+            <TextView
+                android:id="@+id/weatherPressureValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weatherSubHeadTextView"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@+id/weatherHumidityTitleTextView"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="--"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="927 hPa"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/weatherWindDetailsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/weatherPressureDetailsLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/weatherWindTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/weatherSubHeadTextView"
+                android:layout_weight="1"
+                android:text="@string/wind_title"
+                android:textColor="@color/white"
+                android:textSize="20sp"/>
+
+
+            <TextView
+                android:id="@+id/weatherWindValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weatherSubHeadTextView"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@+id/weatherHumidityTitleTextView"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="--"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                tools:text="1 mph SE"/>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</android.support.v4.widget.NestedScrollView>

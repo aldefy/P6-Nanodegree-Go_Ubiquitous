@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="@color/windowBackground"
+    android:layout_height="match_parent">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
@@ -39,6 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:buttonTint="@color/white"
                 android:clickable="false"/>
 
 
@@ -49,7 +51,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@+id/weather_notifications_checkbox"
                 android:text="@string/weather_notification_checkbox_heading"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
 
@@ -78,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:text="@string/weather_units_heading"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
             <TextView
@@ -88,6 +90,7 @@
                 android:layout_below="@+id/temperature_units_heading"
                 android:paddingTop="4dp"
                 android:text="@string/value_units_metric"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
         </RelativeLayout>
@@ -119,7 +122,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_toStartOf="@+id/gpsLocationButton"
                 android:text="@string/weather_location_heading"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
             <TextView
@@ -130,6 +133,7 @@
                 android:layout_toStartOf="@+id/gpsLocationButton"
                 android:paddingTop="4dp"
                 android:text="@string/value_location_metric"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
             <ImageButton
@@ -140,6 +144,7 @@
                 android:background="@color/transparent"
                 android:contentDescription="@string/myLocation_gps"
                 android:padding="8dp"
+                android:clickable="false"
                 android:src="@drawable/ic_my_location"/>
 
         </RelativeLayout>
@@ -171,7 +176,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_toStartOf="@+id/weather_icon_image"
                 android:text="@string/weather_icon_heading"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
             <TextView
@@ -182,6 +187,7 @@
                 android:layout_toStartOf="@+id/weather_icon_image"
                 android:paddingTop="4dp"
                 android:text="@string/value_icon_metric"
+                android:textColor="@color/white"
                 android:textSize="16sp"/>
 
             <ImageButton
@@ -192,6 +198,7 @@
                 android:background="@color/transparent"
                 android:contentDescription="@string/myLocation_gps"
                 android:padding="8dp"
+                android:clickable="false"
                 android:src="@drawable/ic_my_location"/>
 
         </RelativeLayout>

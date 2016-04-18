@@ -1,4 +1,4 @@
-package techgravy.sunshine.ui.week;
+package techgravy.sunshine.ui.main;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +14,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import techgravy.sunshine.R;
+import techgravy.sunshine.interfaces.WeatherClickInterface;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.utils.CommonUtils;
 import timber.log.Timber;
@@ -26,18 +27,22 @@ public class WeekRVAdapter extends RecyclerView.Adapter<WeekRVAdapter.WeatherVie
     List<WeatherForecastModel> forecastList;
     Context context;
     String unit, iconPack;
+    private WeatherClickInterface weatherClickInterface;
 
-    public WeekRVAdapter(Context context, List<WeatherForecastModel> forecastList, String unit, String iconPack) {
+    public WeekRVAdapter(Context context, List<WeatherForecastModel> forecastList, String unit, String iconPack, WeatherClickInterface weatherClickInterface) {
         this.forecastList = forecastList;
+        if (forecastList.size() > 0)
+            Timber.tag("AdapterNPE").d(forecastList.toString());
         this.context = context;
         this.unit = unit;
         this.iconPack = iconPack;
+        this.weatherClickInterface = weatherClickInterface;
     }
 
     @Override
     public WeatherViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_item_weather_week, parent, false);
-        return new WeatherViewHolder(v);
+        return new WeatherViewHolder(v, weatherClickInterface);
     }
 
     @Override
@@ -50,6 +55,7 @@ public class WeekRVAdapter extends RecyclerView.Adapter<WeekRVAdapter.WeatherVie
         holder.listItemHighTextview.setText(CommonUtils.formatTemperature(context, forecast.getTemp().getMax(), unit));
         holder.listItemLowTextview.setText(CommonUtils.formatTemperature(context, forecast.getTemp().getMin(), unit));
         holder.listItemIcon.setImageDrawable(CommonUtils.getWeatherIconFromWeather(context, forecast.getWeather().get(0).getmId(), iconPack));
+        holder.itemView.setTag(forecast);
         runEnterAnimation(holder.itemView);
     }
 
@@ -76,11 +82,18 @@ public class WeekRVAdapter extends RecyclerView.Adapter<WeekRVAdapter.WeatherVie
         TextView listItemHighTextview;
         @Bind(R.id.list_item_low_textview)
         TextView listItemLowTextview;
+        WeatherClickInterface weatherClickInterface;
 
-        WeatherViewHolder(View view) {
+        WeatherViewHolder(View view, WeatherClickInterface weatherClickInterface) {
             super(view);
             ButterKnife.bind(this, view);
+            this.weatherClickInterface = weatherClickInterface;
+            itemView.setOnClickListener(this::handleClick);
+        }
 
+        private void handleClick(View o) {
+            if (weatherClickInterface != null)
+                weatherClickInterface.itemClicked((WeatherForecastModel) o.getTag());
         }
     }
 

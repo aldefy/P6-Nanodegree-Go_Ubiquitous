@@ -9,7 +9,7 @@ import co.uk.rushorm.core.RushCore;
 /**
  * Created by aditlal on 06/04/16.
  */
-public class WeatherForecastCity implements Rush {
+public class TodayForecastCity implements Rush {
 
     private Coord coord;
 
