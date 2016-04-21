@@ -276,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 

@@ -3,8 +3,11 @@ package techgravy.sunshine.ui.main;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ActionProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -86,12 +89,14 @@ public class WeatherDetailFragment extends Fragment {
     NestedScrollView nestedScrollView;
     private WeatherForecastModel forecast;
     private PreferenceManager preferenceManager;
+    private ActionProvider mShareActionProvider;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handleArgs();
+        setHasOptionsMenu(true);
     }
 
     private void handleArgs() {
@@ -144,4 +149,15 @@ public class WeatherDetailFragment extends Fragment {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+
+    }
+
+    // Call to update the share intent
+
 }

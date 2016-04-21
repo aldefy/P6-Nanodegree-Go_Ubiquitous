@@ -34,6 +34,7 @@ import techgravy.sunshine.interfaces.WeatherDetailInterface;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
+import techgravy.sunshine.sync.SunshineSyncAdapter;
 import techgravy.sunshine.utils.CommonUtils;
 import techgravy.sunshine.utils.PreferenceManager;
 import techgravy.sunshine.utils.VerticalSpaceItemDecoration;
@@ -105,6 +106,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
             adapter.notifyDataSetChanged();
         } else
             fetchWeatherFromServer();
+
+        SunshineSyncAdapter.syncImmediately(getActivity());
         return view;
     }
 
