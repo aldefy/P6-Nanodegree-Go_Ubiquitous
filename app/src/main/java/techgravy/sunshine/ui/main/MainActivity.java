@@ -42,6 +42,7 @@ import techgravy.sunshine.interfaces.WeatherDetailInterface;
 import techgravy.sunshine.models.PhotoResponse;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
+import techgravy.sunshine.sync.SunshineSyncAdapter;
 import techgravy.sunshine.ui.settings.SettingFragment;
 import techgravy.sunshine.ui.settings.SettingsRefreshInterface;
 import techgravy.sunshine.utils.CommonUtils;
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
         openHome();
 
         setHeaderView();
+        SunshineSyncAdapter.initializeSyncAdapter(MainActivity.this);
     }
 
 
@@ -181,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
                 setHeaderData(headerModel);
             }
         };
-        MainApplication.getApplication().setSubscriber(subscriber);
+        MainApplication.getApplication().setWeatherHeaderModelSubscriber(subscriber);
         if (photoResponse == null)
             getHeaderImage();
         aboutImageBackground.setOnClickListener(this::open500PxPhoto);

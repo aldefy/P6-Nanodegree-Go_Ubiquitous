@@ -22,6 +22,9 @@ public class WeatherForecastCity implements Rush {
 
     private String country;
 
+    public WeatherForecastCity() {
+    }
+
     public Coord getCoord() {
         return coord;
     }

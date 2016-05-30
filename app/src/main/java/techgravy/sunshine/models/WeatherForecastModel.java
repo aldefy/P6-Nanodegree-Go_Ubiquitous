@@ -43,6 +43,8 @@ public class WeatherForecastModel implements Rush, Parcelable {
     @SerializedName("temp")
     private Temperature temp;
 
+    public WeatherForecastModel() {
+    }
 
     public float getHumidity() {
         return humidity;

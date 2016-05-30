@@ -6,15 +6,42 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.os.Build;
 import android.os.Bundle;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
+import techgravy.sunshine.api.ForecastApiGenerator;
+import techgravy.sunshine.api.GetForecastApi;
+import techgravy.sunshine.models.WeatherHeaderModel;
+import techgravy.sunshine.models.WeatherResponse;
+import techgravy.sunshine.utils.CommonUtils;
+import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
+
+import static techgravy.sunshine.BuildConfig.API_KEY;
 
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
-    public static final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
+    public static final String LOG_TAG = "SunshineAdapterTag";
+    public static final String ACTION_DATA_UPDATED =
+            "techgravy.sunshine.ACTION_DATA_UPDATED";
+    private GetForecastApi getForecastApi;
+    private PreferenceManager preferenceManager;
+    // Interval at which to sync with the weather, in seconds.
+    // 60 seconds (1 minute) * 180 = 3 hours
+    public static final int SYNC_INTERVAL = 60 * 180;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -23,8 +50,74 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Timber.tag(LOG_TAG).d("onPerformSync Called.");
+        fetchWeatherFromServer();
 
     }
+
+    private void fetchWeatherFromServer() {
+        Timber.tag("Calling").d("Calling Api");
+        preferenceManager = MainApplication.getApplication().getPreferenceManager();
+        getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
+        Context context = getContext();
+        getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<WeatherResponse, WeatherResponse>() {
+                    @Override
+                    public WeatherResponse call(WeatherResponse weatherResponse) {
+
+                        WeatherResponse response = weatherResponse;
+
+                        response.save();
+                        return weatherResponse;
+                    }
+                })
+                .map(weatherResponse -> {
+                    Observable<WeatherHeaderModel> quotaObservable = Observable.create(
+                            new Observable.OnSubscribe<WeatherHeaderModel>() {
+                                @Override
+                                public void call(Subscriber<? super WeatherHeaderModel> sub) {
+                                    WeatherHeaderModel model = new WeatherHeaderModel();
+                                    model.setCity(weatherResponse.getCity().getName());
+                                    model.setHumidity(context.getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
+                                    model.setWind(CommonUtils.getFormattedWind(context, preferenceManager.getUnit(), weatherResponse.getList().get(0).getSpeed(), weatherResponse.getList().get(0).getDeg()));
+                                    model.setPressure(context.getString(R.string.format_pressure, weatherResponse.getList().get(0).getPressure()));
+                                    int tempType = CommonUtils.calculateTimeOfDay();
+                                    if (tempType == CommonUtils.TIME_NIGHT)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getNight());
+                                    else if (tempType == CommonUtils.TIME_MORNING)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMorn());
+                                    else if (tempType == CommonUtils.TIME_DAY)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getDay());
+                                    else if (tempType == CommonUtils.TIME_EVE)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getEve());
+                                    else
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
+                                    model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
+                                    model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(context, weatherResponse.getList().get(0).getWeather().get(0).getmId()));
+                                    Timber.tag("Header").d(model.toString());
+                                    sub.onNext(model);
+                                    sub.onCompleted();
+                                }
+                            }
+                    );
+                    quotaObservable
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(MainApplication.getApplication().getWeatherHeaderModelSubscriber());
+
+                    return weatherResponse;
+                })
+                .subscribe(MainApplication.getApplication().getWeatherResponseSubscriber());
+    }
+
+    private void updateWidgets() {
+        Context context = getContext();
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                .setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
+    }
+
 
     /**
      * Helper method to have the sync adapter sync immediately
@@ -38,6 +131,25 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
+    }
+
+    /**
+     * Helper method to schedule the sync adapter periodic execution
+     */
+    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+        Account account = getSyncAccount(context);
+        String authority = context.getString(R.string.content_authority);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // we can enable inexact timers in our periodic sync
+            SyncRequest request = new SyncRequest.Builder().
+                    syncPeriodic(syncInterval, flexTime).
+                    setSyncAdapter(account, authority).
+                    setExtras(new Bundle()).build();
+            ContentResolver.requestSync(request);
+        } else {
+            ContentResolver.addPeriodicSync(account,
+                    authority, new Bundle(), syncInterval);
+        }
     }
 
     /**
@@ -73,8 +185,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
              * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
+            onAccountCreated(newAccount, context);
 
         }
         return newAccount;
+    }
+
+    private static void onAccountCreated(Account newAccount, Context context) {
+        /*
+         * Since we've created an account
+         */
+        SunshineSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+
+        /*
+         * Without calling setSyncAutomatically, our periodic sync will not be enabled.
+         */
+        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+
+        /*
+         * Finally, let's do a sync to get things started
+         */
+        //  syncImmediately(context);
+    }
+
+    public static void initializeSyncAdapter(Context context) {
+        getSyncAccount(context);
     }
 }

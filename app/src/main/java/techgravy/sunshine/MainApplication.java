@@ -34,7 +34,8 @@ public class MainApplication extends Application {
     public ModuleComponent moduleComponent;
     PreferenceManager preferenceManager;
     public static MainApplication application;
-    private Subscriber<WeatherHeaderModel> subscriber;
+    private Subscriber<WeatherHeaderModel> weatherHeaderModelSubscriber;
+    private Subscriber<WeatherResponse> weatherResponseSubscriber;
 
     @Override
     public void onCreate() {
@@ -82,11 +83,19 @@ public class MainApplication extends Application {
         return preferenceManager;
     }
 
-    public Subscriber<WeatherHeaderModel> getSubscriber() {
-        return subscriber;
+    public Subscriber<WeatherHeaderModel> getWeatherHeaderModelSubscriber() {
+        return weatherHeaderModelSubscriber;
     }
 
-    public void setSubscriber(Subscriber<WeatherHeaderModel> subscriber) {
-        this.subscriber = subscriber;
+    public void setWeatherHeaderModelSubscriber(Subscriber<WeatherHeaderModel> subscriber) {
+        this.weatherHeaderModelSubscriber = subscriber;
+    }
+
+    public Subscriber<WeatherResponse> getWeatherResponseSubscriber() {
+        return weatherResponseSubscriber;
+    }
+
+    public void setWeatherResponseSubscriber(Subscriber<WeatherResponse> weatherResponseSubscriber) {
+        this.weatherResponseSubscriber = weatherResponseSubscriber;
     }
 }

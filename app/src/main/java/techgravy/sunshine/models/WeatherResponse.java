@@ -25,6 +25,9 @@ public class WeatherResponse implements Rush {
 
     private WeatherForecastCity city;
 
+    public WeatherResponse() {
+    }
+
     public String getMessage() {
         return message;
     }

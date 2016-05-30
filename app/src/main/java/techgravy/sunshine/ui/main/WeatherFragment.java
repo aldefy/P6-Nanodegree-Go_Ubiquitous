@@ -18,12 +18,11 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.BindString;
 import butterknife.ButterKnife;
+import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushSearch;
-import co.uk.rushorm.core.RushSearchCallback;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
@@ -34,7 +33,6 @@ import techgravy.sunshine.interfaces.WeatherDetailInterface;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
-import techgravy.sunshine.sync.SunshineSyncAdapter;
 import techgravy.sunshine.utils.CommonUtils;
 import techgravy.sunshine.utils.PreferenceManager;
 import techgravy.sunshine.utils.VerticalSpaceItemDecoration;
@@ -57,6 +55,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
     @BindString(R.string.forecast_empty)
     String forecastEmpty;
     WeatherDetailInterface detailInterface;
+    Subscriber<WeatherResponse> weatherResponseSubscriber;
+
 
     @Override
     public void onAttach(Context context) {
@@ -69,7 +69,6 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         Timber.tag("FragmentTag").d("onCreate");
-        forecastList = new ArrayList<>();
 
     }
 
@@ -88,152 +87,126 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
         View view = inflater.inflate(R.layout.fragment_weather_week, container, false);
         ButterKnife.bind(this, view);
         Timber.tag("FragmentTag").d("onCreateView");
+        init();
+
+        //NotificationHelper.expandablePictureNotification(MainActivity.this, "New Notification", "http://api.randomuser.me/portraits/women/39.jpg")
+        return view;
+    }
+
+    private void init() {
+        forecastList = new ArrayList<>();
         preferenceManager = MainApplication.getApplication().getPreferenceManager();
         adapter = new WeekRVAdapter(getActivity(), forecastList, preferenceManager.getUnit(), preferenceManager.getIconPack(), this);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(llm);
+
         //add ItemDecoration
         recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(4));
         recyclerView.setAdapter(adapter);
 
-        //NotificationHelper.expandablePictureNotification(MainActivity.this, "New Notification", "http://api.randomuser.me/portraits/women/39.jpg")
         getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
-
-        // callDBFirst();
+        initSubscriber();
+        callDBFirst();
         checkAdapterIsEmpty(forecastEmpty);
-        if (savedInstanceState != null) {
-            forecastList = (ArrayList<WeatherForecastModel>) savedInstanceState.get(CommonUtils.LIST_SAVE_INSTANCE);
-            adapter.notifyDataSetChanged();
-        } else
-            fetchWeatherFromServer();
-
-        SunshineSyncAdapter.syncImmediately(getActivity());
-        return view;
     }
 
     private void callDBFirst() {
-        Observable.create(new Observable.OnSubscribe<WeatherResponse>() {
-            @Override
-            public void call(Subscriber<? super WeatherResponse> subscriber) {
-                new RushSearch().find(WeatherResponse.class, new RushSearchCallback<WeatherResponse>() {
-                    @Override
-                    public void complete(List<WeatherResponse> list) {
-                        if (list.size() > 0) {
-                            subscriber.onNext(list.get(0));
-                            subscriber.onCompleted(); // Nothing more to emit
-                        } else {
-                            subscriber.onError(new Throwable("No saved response"));
-                        }
-                    }
-                });
+        new RushSearch().find(WeatherResponse.class, list -> {
+            if (list != null)
+                if (list.size() > 0) {
+                    Timber.tag("rushSaved").d(list.get(0).toString());
+                    weatherResponseSubscriber.onNext(list.get(0));
+                    weatherResponseSubscriber.onCompleted(); // Nothing more to emit
+                } else {
+                    weatherResponseSubscriber.onError(new Throwable("No saved response"));
+                    fetchWeatherFromServer();
+                }
+            else {
+                weatherResponseSubscriber.onError(new Throwable("No saved response"));
+                fetchWeatherFromServer();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<WeatherResponse>() {
+        });
+
+    }
+
+    private void initSubscriber() {
+        Timber.tag("initSubscriber").d("init weatherResponseSubscriber");
+
+        weatherResponseSubscriber = new Subscriber<WeatherResponse>() {
             @Override
             public void onCompleted() {
+                //   forecastList.clear();
             }
 
             @Override
             public void onError(Throwable e) {
-                Timber.e(e, "Error , fetching from server");
-                checkAdapterIsEmpty(forecastEmpty);
-                fetchWeatherFromServer();
+                Timber.e(e, "Error");
+                checkAdapterIsEmpty("Unable to fetch data at the moment");
             }
 
             @Override
-            public void onNext(WeatherResponse weatherResponse) {
+            public void onNext(WeatherResponse model) {
                 forecastList.clear();
-                forecastList.addAll(weatherResponse.getList());
-                Timber.tag("DBLoaded").d(weatherResponse.getList().toString());
+                forecastList.addAll(model.getList());
                 adapter.notifyDataSetChanged();
+                checkAdapterIsEmpty("Unable to fetch data at the moment");
+
             }
-        });
+        };
+        MainApplication.getApplication().setWeatherResponseSubscriber(weatherResponseSubscriber);
     }
 
     private void fetchWeatherFromServer() {
-        Timber.tag("Calling").d("Calling Api");
-        getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY).subscribeOn(Schedulers.io())
+        getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-               /* .map(new Func1<WeatherResponse, WeatherResponse>() {
-                    @Override
-                    public WeatherResponse call(WeatherResponse weatherResponse) {
-                        *//* Get all objects *//*
-                        WeatherResponse response = weatherResponse;
-                        List<WeatherResponse> objects = new RushSearch().find(WeatherResponse.class);
-                        RushCore.getInstance().delete(objects, new RushCallback() {
-                            @Override
-                            public void complete() {
-                                response.save(new RushCallback() {
-                                    @Override
-                                    public void complete() {
-                                        Timber.tag("RushSaved");
-                                        Timber.d(response.toString());
-                                    }
-                                });
-                            }
+                .map(weatherResponse -> {
+                    List<WeatherResponse> objects = new RushSearch().find(WeatherResponse.class);
+                    RushCore.getInstance().delete(objects, () -> {
+                        weatherResponse.save(() -> {
+                            Timber.tag("RushSaved");
+                            Timber.d(weatherResponse.toString());
                         });
-                        return weatherResponse;
-                    }
-                })*/
-                .map(new Func1<WeatherResponse, WeatherResponse>() {
-                    @Override
-                    public WeatherResponse call(WeatherResponse weatherResponse) {
-                        Observable<WeatherHeaderModel> quotaObservable = Observable.create(
-                                new Observable.OnSubscribe<WeatherHeaderModel>() {
-                                    @Override
-                                    public void call(Subscriber<? super WeatherHeaderModel> sub) {
-                                        WeatherHeaderModel model = new WeatherHeaderModel();
-                                        model.setCity(weatherResponse.getCity().getName());
-                                        model.setHumidity(getActivity().getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
-                                        model.setWind(CommonUtils.getFormattedWind(getActivity(), preferenceManager.getUnit(), weatherResponse.getList().get(0).getSpeed(), weatherResponse.getList().get(0).getDeg()));
-                                        model.setPressure(getActivity().getString(R.string.format_pressure, weatherResponse.getList().get(0).getPressure()));
-                                        int tempType = CommonUtils.calculateTimeOfDay();
-                                        if (tempType == CommonUtils.TIME_NIGHT)
-                                            model.setTemp(weatherResponse.getList().get(0).getTemp().getNight());
-                                        else if (tempType == CommonUtils.TIME_MORNING)
-                                            model.setTemp(weatherResponse.getList().get(0).getTemp().getMorn());
-                                        else if (tempType == CommonUtils.TIME_DAY)
-                                            model.setTemp(weatherResponse.getList().get(0).getTemp().getDay());
-                                        else if (tempType == CommonUtils.TIME_EVE)
-                                            model.setTemp(weatherResponse.getList().get(0).getTemp().getEve());
-                                        else
-                                            model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
-                                        model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
-                                        model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(getActivity(), weatherResponse.getList().get(0).getWeather().get(0).getmId()));
-                                        Timber.tag("Header").d(model.toString());
-                                        sub.onNext(model);
-                                        sub.onCompleted();
-                                    }
-                                }
-                        );
-                        quotaObservable
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(MainApplication.getApplication().getSubscriber());
-
-                        return weatherResponse;
-                    }
+                    });
+                    return weatherResponse;
                 })
-                .subscribe(new Subscriber<WeatherResponse>() {
-                    @Override
-                    public void onCompleted() {
-                        //   forecastList.clear();
-                    }
+                .map(weatherResponse -> {
+                    Observable<WeatherHeaderModel> quotaObservable = Observable.create(
+                            new Observable.OnSubscribe<WeatherHeaderModel>() {
+                                @Override
+                                public void call(Subscriber<? super WeatherHeaderModel> sub) {
+                                    WeatherHeaderModel model = new WeatherHeaderModel();
+                                    model.setCity(weatherResponse.getCity().getName());
+                                    model.setHumidity(getActivity().getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
+                                    model.setWind(CommonUtils.getFormattedWind(getActivity(), preferenceManager.getUnit(), weatherResponse.getList().get(0).getSpeed(), weatherResponse.getList().get(0).getDeg()));
+                                    model.setPressure(getActivity().getString(R.string.format_pressure, weatherResponse.getList().get(0).getPressure()));
+                                    int tempType = CommonUtils.calculateTimeOfDay();
+                                    if (tempType == CommonUtils.TIME_NIGHT)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getNight());
+                                    else if (tempType == CommonUtils.TIME_MORNING)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMorn());
+                                    else if (tempType == CommonUtils.TIME_DAY)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getDay());
+                                    else if (tempType == CommonUtils.TIME_EVE)
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getEve());
+                                    else
+                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
+                                    model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
+                                    model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(getActivity(), weatherResponse.getList().get(0).getWeather().get(0).getmId()));
+                                    Timber.tag("Header").d(model.toString());
+                                    sub.onNext(model);
+                                    sub.onCompleted();
+                                }
+                            }
+                    );
+                    quotaObservable
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(MainApplication.getApplication().getWeatherHeaderModelSubscriber());
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "Error");
-                        checkAdapterIsEmpty("Unable to fetch data at the moment");
-                    }
+                    return weatherResponse;
+                }).subscribe(weatherResponseSubscriber);
 
-                    @Override
-                    public void onNext(WeatherResponse model) {
-                        forecastList.clear();
-                        forecastList.addAll(model.getList());
-                        adapter.notifyDataSetChanged();
-                        checkAdapterIsEmpty("Unable to fetch data at the moment");
-
-                    }
-                });
     }
 
     private void checkAdapterIsEmpty(String message) {
@@ -252,6 +225,7 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+        weatherResponseSubscriber.unsubscribe();
     }
 
 
