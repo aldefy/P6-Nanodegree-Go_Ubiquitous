@@ -173,12 +173,12 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
 
             @Override
             public void onError(Throwable e) {
-
+                e.printStackTrace();
             }
 
             @Override
             public void onNext(WeatherHeaderModel weatherHeaderModel) {
-                Timber.tag("Header").d(weatherHeaderModel.toString());
+                Timber.tag("HeaderSubscriber").d(weatherHeaderModel.toString());
                 headerModel = weatherHeaderModel;
                 setHeaderData(headerModel);
             }
@@ -321,12 +321,13 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
 
     private void openDetails(WeatherForecastModel model) {
         appBarLayout.setExpanded(false, true);
+        Timber.tag("DetailsID").d(model.getId() + "");
         isDetailLoaded = true;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         fragmentTransaction = fragmentManager.beginTransaction();
         detailFragment = new WeatherDetailFragment();
         Bundle extras = new Bundle();
-        extras.putParcelable("forecast", model);
+        extras.putInt("forecastId", model.getId());
         detailFragment.setArguments(extras);
         fragmentTransaction.add(R.id.fragmentContainer, detailFragment, "details");
         fragmentTransaction.commit();
@@ -342,8 +343,8 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("headerModel", headerModel);
-        outState.putParcelable("photoResponse", photoResponse);
+        //outState.putParcelable("headerModel", headerModel);
+        //outState.putParcelable("photoResponse", photoResponse);
     }
 
     @Override

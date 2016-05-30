@@ -4,20 +4,11 @@ import android.app.Application;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import co.uk.rushorm.android.AndroidInitializeConfig;
-import co.uk.rushorm.core.Rush;
-import co.uk.rushorm.core.RushCore;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import rx.Subscriber;
 import techgravy.sunshine.interfaces.DaggerModuleComponent;
 import techgravy.sunshine.interfaces.ModuleComponent;
-import techgravy.sunshine.models.Coord;
-import techgravy.sunshine.models.Temperature;
-import techgravy.sunshine.models.Weather;
-import techgravy.sunshine.models.WeatherForecastCity;
-import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.module.PrefModule;
@@ -62,18 +53,13 @@ public class MainApplication extends Application {
     }
 
     private void initializeDB() {
-        List<Class<? extends Rush>> classes = new ArrayList<>();
-        // Add classes
-        classes.add(Coord.class);
-        classes.add(Temperature.class);
-        classes.add(Weather.class);
-        classes.add(WeatherForecastCity.class);
-        classes.add(WeatherForecastModel.class);
-        classes.add(WeatherResponse.class);
-        AndroidInitializeConfig config = new AndroidInitializeConfig(getApplicationContext());
-        config.setClasses(classes);
-        RushCore.initialize(config);
+        // Create a RealmConfiguration that saves the Realm file in the app's "files" directory.
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this).build();
+        Realm.setDefaultConfiguration(realmConfig);
+
     }
+
+
 
     public static MainApplication getApplication() {
         return application;

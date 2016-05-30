@@ -1,22 +1,23 @@
 package techgravy.sunshine.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-import co.uk.rushorm.core.Rush;
-import co.uk.rushorm.core.RushCallback;
-import co.uk.rushorm.core.RushCore;
-import co.uk.rushorm.core.annotations.RushList;
-import timber.log.Timber;
+import io.realm.RealmList;
+import io.realm.RealmModel;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
 
 /**
  * Created by aditlal on 06/04/16.
  */
-public class WeatherForecastModel implements Rush, Parcelable {
+@RealmClass
+public class WeatherForecastModel implements RealmModel, Serializable {
+
+    @PrimaryKey
+    private int id;
 
     @SerializedName("clouds")
     private float clouds;
@@ -36,9 +37,8 @@ public class WeatherForecastModel implements Rush, Parcelable {
     @SerializedName("deg")
     private float deg;
 
-    @RushList(classType = Weather.class)
     @SerializedName("weather")
-    private List<Weather> weather;
+    private RealmList<Weather> weather;
 
     @SerializedName("temp")
     private Temperature temp;
@@ -82,7 +82,7 @@ public class WeatherForecastModel implements Rush, Parcelable {
         return weather;
     }
 
-    public void setWeather(List<Weather> weather) {
+    public void setWeather(RealmList<Weather> weather) {
         this.weather = weather;
     }
 
@@ -110,38 +110,21 @@ public class WeatherForecastModel implements Rush, Parcelable {
         this.dt = dt;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "ClassPojo [clouds = " + clouds + ", dt = " + dt + ", humidity = " + humidity + ", pressure = " + pressure + ", speed = " + speed + ", deg = " + deg + ", weather = " + weather + ", temp = " + temp + "]";
     }
 
-    @Override
-    public void save() {
-        Timber.tag("RushSave").d(toString());
-        RushCore.getInstance().save(this);
-    }
 
-    @Override
-    public void save(RushCallback callback) {
-        RushCore.getInstance().save(this, callback);
-    }
-
-    @Override
-    public void delete() {
-        RushCore.getInstance().delete(this);
-    }
-
-    @Override
-    public void delete(RushCallback callback) {
-        RushCore.getInstance().delete(this, callback);
-    }
-
-    @Override
-    public String getId() {
-        return RushCore.getInstance().getId(this);
-    }
-
-    @Override
+ /*   @Override
     public int describeContents() {
         return 0;
     }
@@ -181,6 +164,6 @@ public class WeatherForecastModel implements Rush, Parcelable {
         List<Weather> myList = null;
         in.readList(myList, List.class.getClassLoader());
         weather = myList;
-    }
+    }*/
 
 }

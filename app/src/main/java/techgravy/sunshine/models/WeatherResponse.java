@@ -2,27 +2,27 @@ package techgravy.sunshine.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+import java.io.Serializable;
 
-import co.uk.rushorm.core.Rush;
-import co.uk.rushorm.core.RushCallback;
-import co.uk.rushorm.core.RushCore;
-import co.uk.rushorm.core.annotations.RushList;
+import io.realm.RealmList;
+import io.realm.RealmModel;
+import io.realm.annotations.RealmClass;
 
 /**
  * Created by aditlal on 06/04/16.
  */
-public class WeatherResponse implements Rush {
+@RealmClass
+public class WeatherResponse implements RealmModel, Serializable {
     private String message;
 
     private String cnt;
 
     private String cod;
 
-    @RushList(classType = WeatherForecastModel.class)
     @SerializedName("list")
-    private List<WeatherForecastModel> list;
+    private RealmList<WeatherForecastModel> list;
 
+    @SerializedName("city")
     private WeatherForecastCity city;
 
     public WeatherResponse() {
@@ -52,11 +52,11 @@ public class WeatherResponse implements Rush {
         this.cod = cod;
     }
 
-    public List<WeatherForecastModel> getList() {
+    public RealmList<WeatherForecastModel> getList() {
         return list;
     }
 
-    public void setList(List<WeatherForecastModel> list) {
+    public void setList(RealmList<WeatherForecastModel> list) {
         this.list = list;
     }
 
@@ -73,28 +73,5 @@ public class WeatherResponse implements Rush {
         return "ClassPojo [message = " + message + ", cnt = " + cnt + ", cod = " + cod + ", list = " + list + ", city = " + city + "]";
     }
 
-    @Override
-    public void save() {
-        RushCore.getInstance().save(this);
-    }
 
-    @Override
-    public void save(RushCallback callback) {
-        RushCore.getInstance().save(this, callback);
-    }
-
-    @Override
-    public void delete() {
-        RushCore.getInstance().delete(this);
-    }
-
-    @Override
-    public void delete(RushCallback callback) {
-        RushCore.getInstance().delete(this, callback);
-    }
-
-    @Override
-    public String getId() {
-        return RushCore.getInstance().getId(this);
-    }
 }

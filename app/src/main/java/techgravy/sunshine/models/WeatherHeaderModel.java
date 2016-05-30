@@ -1,12 +1,13 @@
 package techgravy.sunshine.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import io.realm.RealmModel;
+import io.realm.annotations.RealmClass;
 
 /**
  * Created by aditlal on 18/04/16.
  */
-public class WeatherHeaderModel implements Parcelable {
+@RealmClass
+public class WeatherHeaderModel implements RealmModel {
 
     String city;
     String wind;
@@ -88,42 +89,5 @@ public class WeatherHeaderModel implements Parcelable {
                 '}';
     }
 
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(city);
-        dest.writeString(wind);
-        dest.writeString(pressure);
-        dest.writeString(humidity);
-        dest.writeDouble(temp);
-        dest.writeString(weatherCondition);
-    }
-
-    // Creator
-    public static final Parcelable.Creator<WeatherHeaderModel> CREATOR
-            = new Parcelable.Creator<WeatherHeaderModel>() {
-        public WeatherHeaderModel createFromParcel(Parcel in) {
-            return new WeatherHeaderModel(in);
-        }
-
-        public WeatherHeaderModel[] newArray(int size) {
-            return new WeatherHeaderModel[size];
-        }
-    };
-
-    // "De-parcel object
-    public WeatherHeaderModel(Parcel in) {
-        city = in.readString();
-        wind = in.readString();
-        pressure = in.readString();
-        humidity = in.readString();
-        temp = in.readDouble();
-        weatherCondition = in.readString();
-    }
 
 }

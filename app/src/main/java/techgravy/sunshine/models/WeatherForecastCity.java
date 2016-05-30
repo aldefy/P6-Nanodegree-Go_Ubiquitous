@@ -2,14 +2,16 @@ package techgravy.sunshine.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import co.uk.rushorm.core.Rush;
-import co.uk.rushorm.core.RushCallback;
-import co.uk.rushorm.core.RushCore;
+import java.io.Serializable;
+
+import io.realm.RealmModel;
+import io.realm.annotations.RealmClass;
 
 /**
  * Created by aditlal on 06/04/16.
  */
-public class WeatherForecastCity implements Rush {
+@RealmClass
+public class WeatherForecastCity implements RealmModel, Serializable {
 
     private Coord coord;
 
@@ -70,28 +72,5 @@ public class WeatherForecastCity implements Rush {
         return "ClassPojo [coord = " + coord + ", mId = " + mId + ", name = " + name + ", population = " + population + ", country = " + country + "]";
     }
 
-    @Override
-    public void save() {
-        RushCore.getInstance().save(this);
-    }
 
-    @Override
-    public void save(RushCallback callback) {
-        RushCore.getInstance().save(this, callback);
-    }
-
-    @Override
-    public void delete() {
-        RushCore.getInstance().delete(this);
-    }
-
-    @Override
-    public void delete(RushCallback callback) {
-        RushCore.getInstance().delete(this, callback);
-    }
-
-    @Override
-    public String getId() {
-        return RushCore.getInstance().getId(this);
-    }
 }

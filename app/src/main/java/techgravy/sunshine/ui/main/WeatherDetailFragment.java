@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
 import techgravy.sunshine.models.WeatherForecastModel;
@@ -90,19 +91,22 @@ public class WeatherDetailFragment extends Fragment {
     private WeatherForecastModel forecast;
     private PreferenceManager preferenceManager;
     private ActionProvider mShareActionProvider;
+    Realm realm;
+    int forecastId;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        realm = Realm.getDefaultInstance();
         handleArgs();
         setHasOptionsMenu(true);
     }
 
     private void handleArgs() {
         Bundle extras = getArguments();
-        forecast = (WeatherForecastModel) extras.getParcelable("forecast");
-        if (forecast != null) Timber.tag("Details").d(forecast.toString());
+        forecastId = extras.getInt("forecastId");
+        Timber.tag("DetailsID").d(forecastId + "");
     }
 
     @Nullable
@@ -111,7 +115,12 @@ public class WeatherDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
         ButterKnife.bind(this, rootView);
         preferenceManager = MainApplication.getApplication().getPreferenceManager();
-        initViews();
+        realm.executeTransaction(realm1 -> {
+            Timber.tag("DetailsID").d(forecastId + "");
+
+            forecast = realm1.where(WeatherForecastModel.class).equalTo("id", forecastId).findFirst();
+            if (forecast != null) initViews();
+        });
         return rootView;
     }
 

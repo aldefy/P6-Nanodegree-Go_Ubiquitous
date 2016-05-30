@@ -12,17 +12,17 @@ import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
 
+import io.realm.Realm;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
 import techgravy.sunshine.api.ForecastApiGenerator;
 import techgravy.sunshine.api.GetForecastApi;
+import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
-import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.utils.CommonUtils;
 import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
@@ -41,6 +41,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    Realm realm;
 
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
@@ -50,6 +51,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Timber.tag(LOG_TAG).d("onPerformSync Called.");
+        realm = Realm.getDefaultInstance();
         fetchWeatherFromServer();
 
     }
@@ -61,41 +63,50 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         Context context = getContext();
         getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<WeatherResponse, WeatherResponse>() {
-                    @Override
-                    public WeatherResponse call(WeatherResponse weatherResponse) {
-
-                        WeatherResponse response = weatherResponse;
-
-                        response.save();
-                        return weatherResponse;
-                    }
-                })
                 .map(weatherResponse -> {
+                    // response.save();
+                    realm.beginTransaction();
+                    realm.deleteAll();
+                    realm.commitTransaction();
+                    // Get a Realm instance for this thread
+                    for (int i = 0; i < weatherResponse.getList().size(); i++) {
+                        WeatherForecastModel forecastModel = weatherResponse.getList().get(i);
+                        forecastModel.setId(i);
+                    }
+                    // All writes must be wrapped in a transaction to facilitate safe multi threading
+                    realm.executeTransaction(realm1 -> {
+                        // All writes must be wrapped in a transaction to facilitate safe multi threading
+                        realm.executeTransaction(realm2 -> {
+                            realm1.copyToRealm(weatherResponse);
+
+                        });
+                    });
+                    WeatherHeaderModel model = new WeatherHeaderModel();
+                    model.setCity(weatherResponse.getCity().getName());
+                    model.setHumidity(context.getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
+                    model.setWind(CommonUtils.getFormattedWind(context, preferenceManager.getUnit(), weatherResponse.getList().get(0).getSpeed(), weatherResponse.getList().get(0).getDeg()));
+                    model.setPressure(context.getString(R.string.format_pressure, weatherResponse.getList().get(0).getPressure()));
+                    int tempType = CommonUtils.calculateTimeOfDay();
+                    if (tempType == CommonUtils.TIME_NIGHT)
+                        model.setTemp(weatherResponse.getList().get(0).getTemp().getNight());
+                    else if (tempType == CommonUtils.TIME_MORNING)
+                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMorn());
+                    else if (tempType == CommonUtils.TIME_DAY)
+                        model.setTemp(weatherResponse.getList().get(0).getTemp().getDay());
+                    else if (tempType == CommonUtils.TIME_EVE)
+                        model.setTemp(weatherResponse.getList().get(0).getTemp().getEve());
+                    else
+                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
+                    model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
+                    model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(context, weatherResponse.getList().get(0).getWeather().get(0).getmId()));
+                    Timber.tag("Headersubscriber").d(model.toString());
                     Observable<WeatherHeaderModel> quotaObservable = Observable.create(
                             new Observable.OnSubscribe<WeatherHeaderModel>() {
                                 @Override
                                 public void call(Subscriber<? super WeatherHeaderModel> sub) {
-                                    WeatherHeaderModel model = new WeatherHeaderModel();
-                                    model.setCity(weatherResponse.getCity().getName());
-                                    model.setHumidity(context.getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
-                                    model.setWind(CommonUtils.getFormattedWind(context, preferenceManager.getUnit(), weatherResponse.getList().get(0).getSpeed(), weatherResponse.getList().get(0).getDeg()));
-                                    model.setPressure(context.getString(R.string.format_pressure, weatherResponse.getList().get(0).getPressure()));
-                                    int tempType = CommonUtils.calculateTimeOfDay();
-                                    if (tempType == CommonUtils.TIME_NIGHT)
-                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getNight());
-                                    else if (tempType == CommonUtils.TIME_MORNING)
-                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMorn());
-                                    else if (tempType == CommonUtils.TIME_DAY)
-                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getDay());
-                                    else if (tempType == CommonUtils.TIME_EVE)
-                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getEve());
-                                    else
-                                        model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
-                                    model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
-                                    model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(context, weatherResponse.getList().get(0).getWeather().get(0).getmId()));
-                                    Timber.tag("Header").d(model.toString());
+
                                     sub.onNext(model);
+                                    realm.executeTransaction(realm1 -> realm1.copyToRealm(model));
                                     sub.onCompleted();
                                 }
                             }
@@ -107,6 +118,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     return weatherResponse;
                 })
+
                 .subscribe(MainApplication.getApplication().getWeatherResponseSubscriber());
     }
 
