@@ -11,4 +11,6 @@ public interface SettingsRefreshInterface {
     void refreshUnit();
 
     void refreshLocation(Location location);
+
+    void refreshRandomPhoto();
 }

@@ -55,7 +55,7 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
     String forecastEmpty;
     private WeatherDetailInterface detailInterface;
     private Subscriber<WeatherResponse> weatherResponseSubscriber;
-    Realm realm;
+    //  Realm realm;
 
 
     @Override
@@ -87,7 +87,7 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
         View view = inflater.inflate(R.layout.fragment_weather_week, container, false);
         ButterKnife.bind(this, view);
         Timber.tag("FragmentTag").d("onCreateView");
-        realm = Realm.getDefaultInstance();
+        // realm = Realm.getDefaultInstance();
 
         init();
 
@@ -108,7 +108,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
 
         getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
         initSubscriber();
-        callDBFirst();
+        fetchWeatherFromServer();
+        // callDBFirst();
         checkAdapterIsEmpty(forecastEmpty);
     }
 
@@ -206,6 +207,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
             @Override
             public void onNext(WeatherResponse weatherResponse) {
                 forecastList.clear();
+                forecastList.addAll(weatherResponse.getList());
+                adapter.notifyDataSetChanged();
                 WeatherHeaderModel model = new WeatherHeaderModel();
                 model.setCity(weatherResponse.getCity().getName());
                 model.setHumidity(getActivity().getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
@@ -225,24 +228,27 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                 model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
                 model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(getActivity(), weatherResponse.getList().get(0).getWeather().get(0).getmId()));
                 Timber.tag("Headersubscriber").d(model.toString());
-                realm.executeTransaction(realm1 -> realm1.copyToRealm(model));
 
-                Observable<WeatherHeaderModel> quotaObservable = Observable.create(
-                        new Observable.OnSubscribe<WeatherHeaderModel>() {
-                            @Override
-                            public void call(Subscriber<? super WeatherHeaderModel> sub) {
-                                sub.onNext(model);
-                                realm.executeTransaction(realm1 -> realm1.copyToRealm(model));
-                                sub.onCompleted();
+                 /*   Observable<WeatherHeaderModel> quotaObservable = Observable.create(
+                            new Observable.OnSubscribe<WeatherHeaderModel>() {
+                                @Override
+                                public void call(Subscriber<? super WeatherHeaderModel> sub) {
+                                    sub.onNext(model);
+                                    realm.executeTransaction(realm1 -> realm1.copyToRealm(model));
+                                    sub.onCompleted();
+                                }
                             }
-                        }
-                );
-                quotaObservable
-                        .subscribeOn(Schedulers.io())
+                    );*/
+                if (MainApplication.getApplication().getWeatherHeaderModelSubscriber() != null)
+                    Timber.tag("WeatherHeaderSubscriber").d("not null");
+                else
+                    Timber.tag("WeatherHeaderSubscriber").d("null");
+                Observable.just(model).subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(MainApplication.getApplication().getWeatherHeaderModelSubscriber());
-                forecastList.addAll(weatherResponse.getList());
-                adapter.notifyDataSetChanged();
+
+
+                //  quotaObservable
                 checkAdapterIsEmpty("Unable to fetch data at the moment");
 
             }
@@ -251,7 +257,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
     }
 
     public int getForecastNextKey() {
-        return realm.where(WeatherForecastModel.class).max("id").intValue() + 1;
+        //return realm.where(WeatherForecastModel.class).max("id").intValue() + 1;
+        return 1;
     }
 
     private void fetchWeatherFromServer() {
@@ -259,9 +266,11 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(weatherResponse -> {
-                    realm.beginTransaction();
+
+
+                   /* realm.beginTransaction();
                     realm.deleteAll();
-                    realm.commitTransaction();
+                    realm.commitTransaction();*/
                     /*List<WeatherResponse> objects = new RushSearch().find(WeatherResponse.class);
                     RushCore.getInstance().delete(objects, () -> {
                         weatherResponse.save(() -> {
@@ -275,9 +284,9 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                         WeatherForecastModel forecastModel = weatherResponse.getList().get(i);
                         forecastModel.setId(i);
                     }
-                    realm.executeTransaction(realm1 -> {
+                    /*realm.executeTransaction(realm1 -> {
                         realm1.copyToRealm(weatherResponse);
-                    });
+                    });*/
 
 
                     return weatherResponse;

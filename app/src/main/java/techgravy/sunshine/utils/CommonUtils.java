@@ -22,6 +22,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
+import java.util.Random;
+
 import techgravy.sunshine.R;
 import timber.log.Timber;
 
@@ -37,7 +39,7 @@ public class CommonUtils {
     public final static int TIME_EVE = 3;
     public final static int TIME_NIGHT = 4;
     public final static int TIME_UNKNOWN = 5;
-    public final static String LIST_SAVE_INSTANCE ="forecast_list_instance";
+    public final static String LIST_SAVE_INSTANCE = "forecast_list_instance";
 
 
     public static Snackbar displaySnackBar(View view, String message) {
@@ -528,5 +530,15 @@ public class CommonUtils {
         } else {
             return TIME_UNKNOWN;
         }
+    }
+
+    public static int getRandomPhoto() {
+        int max = 19;
+        int min = 0;
+        int diff = max - min;
+        Random rn = new Random();
+        int i = rn.nextInt(diff + 1);
+        i += min;
+        return i;
     }
 }

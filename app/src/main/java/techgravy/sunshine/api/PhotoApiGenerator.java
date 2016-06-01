@@ -33,14 +33,11 @@ public class PhotoApiGenerator {
 
         RestAdapter.Builder builder = new RestAdapter.Builder()
                 .setEndpoint(BASE_URL)
-                .setLog(new RestAdapter.Log() {
-                    @Override
-                    public void log(String message) {
-                        Timber.tag("RetroFit");
-                        Timber.d(message);
-                    }
+                .setLog(message -> {
+                    Timber.tag("RetroFit");
+                    Timber.d(message);
                 })
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .setClient(new OkClient(okHttpClient));
 
         RestAdapter adapter = builder.build();

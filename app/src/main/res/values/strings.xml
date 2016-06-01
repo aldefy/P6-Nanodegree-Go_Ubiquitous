@@ -47,5 +47,7 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">techgravy.sunshine</string>
     <string name="content_authority">techgravy.sunshine</string>
+    <string name="crash_toast_text">App crashed</string>
+    <string name="random_photo_setting_tag">Change Photo background</string>
 
 </resources>

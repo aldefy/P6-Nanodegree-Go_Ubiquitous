@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/windowBackground"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/windowBackground">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
@@ -142,9 +141,9 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:background="@color/transparent"
+                android:clickable="false"
                 android:contentDescription="@string/myLocation_gps"
                 android:padding="8dp"
-                android:clickable="false"
                 android:src="@drawable/ic_my_location"/>
 
         </RelativeLayout>
@@ -196,9 +195,9 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:background="@color/transparent"
+                android:clickable="false"
                 android:contentDescription="@string/myLocation_gps"
                 android:padding="8dp"
-                android:clickable="false"
                 android:src="@drawable/ic_my_location"/>
 
         </RelativeLayout>
@@ -209,5 +208,36 @@
             android:layout_height="1dp"
             android:layout_below="@+id/weather_settings_option4"
             android:background="@color/grey_500"/>
+
+        <RelativeLayout android:id="@+id/photo_setting_layout"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/divider4"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:padding="16dp">
+
+
+            <TextView
+                android:id="@+id/photo_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="@string/random_photo_setting_tag"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
+
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider5"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/photo_setting"
+            android:background="@color/grey_500"/>
     </RelativeLayout>
+
+
 </android.support.v4.widget.NestedScrollView>

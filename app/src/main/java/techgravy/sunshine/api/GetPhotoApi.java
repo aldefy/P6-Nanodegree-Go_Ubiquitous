@@ -9,6 +9,6 @@ import techgravy.sunshine.models.PhotoResponse;
  */
 public interface GetPhotoApi {
 
-    @GET("/search?rpp=10&sort=highest_rating&image_size=21&consumer_key=HrHfRtOrgFqOCcRpcRS7VCteUpw8OYAOjlyall8v&only=abstract")
+    @GET("/search?rpp=20&sort=highest_rating&image_size=21&consumer_key=HrHfRtOrgFqOCcRpcRS7VCteUpw8OYAOjlyall8v&only=weather")
     Observable<PhotoResponse> getPhoto();
 }

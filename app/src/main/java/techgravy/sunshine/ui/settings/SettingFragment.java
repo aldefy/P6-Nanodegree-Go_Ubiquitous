@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import rx.Subscription;
 import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
+import techgravy.sunshine.utils.CommonUtils;
 import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
 
@@ -65,10 +66,40 @@ public class SettingFragment extends Fragment {
     int tempUnitType = 1, iconPackType = 2;
 
 
-    Subscription notificationClickSubscription, notificationCheckboxSubscription, unitsClickSubscription, iconPackClickSubscription;
+    private Subscription notificationClickSubscription, notificationCheckboxSubscription, unitsClickSubscription, iconPackClickSubscription, changePhotoClickSubscription;
     PreferenceManager preferenceManager;
 
     SettingsRefreshInterface settingsRefreshInterface;
+    @Bind(R.id.weatherSettingsHeader)
+    TextView weatherSettingsHeader;
+    @Bind(R.id.weather_notifications_title)
+    TextView weatherNotificationsTitle;
+    @Bind(R.id.divider1)
+    View divider1;
+    @Bind(R.id.temperature_units_heading)
+    TextView temperatureUnitsHeading;
+    @Bind(R.id.divider2)
+    View divider2;
+    @Bind(R.id.weather_location_heading)
+    TextView weatherLocationHeading;
+    @Bind(R.id.weather_location_value)
+    TextView weatherLocationValue;
+    @Bind(R.id.gpsLocationButton)
+    ImageButton gpsLocationButton;
+    @Bind(R.id.weather_settings_option3)
+    RelativeLayout weatherSettingsOption3;
+    @Bind(R.id.divider3)
+    View divider3;
+    @Bind(R.id.weather_icon_heading)
+    TextView weatherIconHeading;
+    @Bind(R.id.divider4)
+    View divider4;
+    @Bind(R.id.photo_heading)
+    TextView photoHeading;
+    @Bind(R.id.photo_setting_layout)
+    RelativeLayout photoSettingLayout;
+    @Bind(R.id.divider5)
+    View divider5;
 
     @Override
     public void onAttach(Context context) {
@@ -91,6 +122,8 @@ public class SettingFragment extends Fragment {
                 RxView.clicks(weatherNotificationLayout).subscribe(view -> weatherNotificationCheckbox.setChecked(!preferenceManager.getWeatherNotificationToggle()));
         unitsClickSubscription = RxView.clicks(weatherTempUnitsLayout).subscribe(v -> handleTemperatureUnits());
         iconPackClickSubscription = RxView.clicks(weatherIconsLayout).subscribe(v -> handleIconPack());
+        changePhotoClickSubscription = RxView.clicks(photoSettingLayout).subscribe(v -> handlePhotoChange());
+
         if (preferenceManager.getUnit().equalsIgnoreCase(unit_imperial)) {
             tempUnitValueTextView.setText(unit_imperial);
         } else {
@@ -110,6 +143,12 @@ public class SettingFragment extends Fragment {
                     .sizeDp(24));
         }
         return rootView;
+    }
+
+    private void handlePhotoChange() {
+        preferenceManager.setPhotoNumber(CommonUtils.getRandomPhoto());
+        if (settingsRefreshInterface != null)
+            settingsRefreshInterface.refreshRandomPhoto();
     }
 
     private void handleIconPack() {

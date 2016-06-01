@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikepenz.iconics.context.IconicsLayoutInflater;
-import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -38,6 +37,7 @@ import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
 import techgravy.sunshine.api.GetPhotoApi;
 import techgravy.sunshine.api.PhotoApiGenerator;
+import techgravy.sunshine.helpers.PicassoCache;
 import techgravy.sunshine.interfaces.WeatherDetailInterface;
 import techgravy.sunshine.models.PhotoResponse;
 import techgravy.sunshine.models.WeatherForecastModel;
@@ -46,7 +46,6 @@ import techgravy.sunshine.sync.SunshineSyncAdapter;
 import techgravy.sunshine.ui.settings.SettingFragment;
 import techgravy.sunshine.ui.settings.SettingsRefreshInterface;
 import techgravy.sunshine.utils.CommonUtils;
-import techgravy.sunshine.utils.GetPalette;
 import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
 
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     TextView photoCredit;
 
     private WeatherHeaderModel headerModel;
-    private boolean isDetailLoaded;
+    private boolean isDetailLoaded, isSettingsLoaded;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
     private PreferenceManager preferenceManager;
@@ -120,8 +119,11 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
 
     private void initViews() {
         isDetailLoaded = false;
+        isSettingsLoaded = false;
         setSupportActionBar(toolbar);
         collapsingToolbar.setTitle("");
+        setHeaderView();
+
         // Set paddingTop of toolbar to height of status bar.
         // Fixes statusbar covers toolbar issue
         collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(MainActivity.this, R.color.transparent));
@@ -159,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
 
         openHome();
 
-        setHeaderView();
         SunshineSyncAdapter.initializeSyncAdapter(MainActivity.this);
     }
 
@@ -168,12 +169,15 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
         Subscriber<WeatherHeaderModel> subscriber = new Subscriber<WeatherHeaderModel>() {
             @Override
             public void onCompleted() {
+                Timber.tag("HeaderSubscriber").d("Completed");
 
             }
 
             @Override
             public void onError(Throwable e) {
                 e.printStackTrace();
+                Timber.tag("HeaderSubscriber").e("Error : " + e.getMessage());
+
             }
 
             @Override
@@ -225,25 +229,35 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     }
 
     private void getHeaderImage() {
-        getPhotoApi.getPhoto().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(new Subscriber<PhotoResponse>() {
-            @Override
-            public void onCompleted() {
+        if (preferenceManager.getImagePath().isEmpty()) {
+            preferenceManager.setPhotoNumber(CommonUtils.getRandomPhoto());
+            getPhotoApi.getPhoto().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(new Subscriber<PhotoResponse>() {
+                @Override
+                public void onCompleted() {
 
-            }
+                }
 
-            @Override
-            public void onError(Throwable e) {
+                @Override
+                public void onError(Throwable e) {
 
-            }
+                }
 
-            @Override
-            public void onNext(PhotoResponse photoResponse) {
-                Timber.tag("PhotoUrl").d("Loaded image url onNext = " + photoResponse.getPhotos().get(0).getImage_url());
-                photoCredit.setText("Photo Credit : " + photoResponse.getPhotos().get(0).getUserModel().getFullname());
-                aboutImageBackground.setTag(photoResponse.getPhotos().get(0).getUrl());
-                Picasso.with(MainActivity.this).load(photoResponse.getPhotos().get(0).getImage_url()).into(aboutImageBackground, new GetPalette(MainActivity.this, aboutImageBackground, getWindow()));
-            }
-        });
+                @Override
+                public void onNext(PhotoResponse photoResponse) {
+                    Timber.tag("PhotoUrl").d("Loaded image url onNext = " + photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getImage_url());
+                    photoCredit.setText("Photo Credit : " + photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getUserModel().getFullname());
+                    preferenceManager.setImageCredit(photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getUserModel().getFullname());
+                    preferenceManager.setImagePath(photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getImage_url());
+                    aboutImageBackground.setTag(photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getUrl());
+                    PicassoCache.getPicassoInstance(MainActivity.this).load(photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getImage_url()).into(aboutImageBackground);
+                    //Picasso.with(MainActivity.this).load(photoResponse.getPhotos().get(preferenceManager.getPhotoNumber()).getImage_url()).into(aboutImageBackground, new GetPalette(MainActivity.this, aboutImageBackground, getWindow()));
+                }
+            });
+        } else {
+            PicassoCache.getPicassoInstance(MainActivity.this).load(preferenceManager.getImagePath()).into(aboutImageBackground);
+            photoCredit.setText("Photo Credit : " + preferenceManager.getImageCredit());
+        }
+
     }
 
 
@@ -274,6 +288,13 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
 
     }
 
+    @Override
+    public void refreshRandomPhoto() {
+        preferenceManager.setImagePath("");
+        preferenceManager.setImageCredit("");
+        getHeaderImage();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -286,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
+                isSettingsLoaded = true;
                 openSettings();
                 return true;
             case android.R.id.home:
@@ -305,6 +327,8 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     }
 
     private void openHome() {
+        isDetailLoaded = false;
+        isSettingsLoaded = false;
         appBarLayout.setExpanded(true, true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         if (fragmentManager.findFragmentByTag("weather") == null)
@@ -349,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
 
     @Override
     public void onBackPressed() {
-        if (!isDetailLoaded)
+        if (!isDetailLoaded && !isSettingsLoaded)
             super.onBackPressed();
         else
             openHome();
