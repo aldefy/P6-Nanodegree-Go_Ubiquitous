@@ -6,7 +6,7 @@ android {
     buildToolsVersion "24.0.1"
 
     defaultConfig {
-        applicationId "techgravy.sunshinewear"
+        applicationId "techgravy.sunshine"
         minSdkVersion 21
         targetSdkVersion 24
         versionCode 1

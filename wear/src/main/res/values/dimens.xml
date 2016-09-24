@@ -1,3 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="time_text_size">40dp</dimen>
+    <dimen name="time_text_size_round">35dp</dimen>
+    <dimen name="time_y_offset">90dp</dimen>
+
+    <dimen name="date_text_size">18dp</dimen>
+    <dimen name="date_text_size_round">17dp</dimen>
+    <dimen name="date_x_offset">23dp</dimen>
+    <dimen name="date_y_offset">120dp</dimen>
+
+    <dimen name="temperature_text_size">18dp</dimen>
+    <dimen name="temperature_text_size_round">18dp</dimen>
+    <dimen name="temperature_y_offset">150dp</dimen>
+
+    <dimen name="weather_icon_width">30dp</dimen>
+    <dimen name="weather_icon_heigh">30dp</dimen>
+    <dimen name="weather_icon_y_offset">220px</dimen>
+    <dimen name="weather_icon_x_offset_Increment">20px</dimen>
 </resources>
