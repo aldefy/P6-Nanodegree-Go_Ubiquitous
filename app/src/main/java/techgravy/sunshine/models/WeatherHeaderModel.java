@@ -1,13 +1,14 @@
 package techgravy.sunshine.models;
 
-import io.realm.RealmModel;
-import io.realm.annotations.RealmClass;
+
+import co.uk.rushorm.core.Rush;
+import co.uk.rushorm.core.RushCallback;
+import co.uk.rushorm.core.RushCore;
 
 /**
  * Created by aditlal on 18/04/16.
  */
-@RealmClass
-public class WeatherHeaderModel implements RealmModel {
+public class WeatherHeaderModel implements Rush {
 
     String city;
     String wind;
@@ -16,6 +17,7 @@ public class WeatherHeaderModel implements RealmModel {
     double temp;
     int weatherId;
     String weatherCondition;
+    double minTemp;
 
     public WeatherHeaderModel() {
 
@@ -89,5 +91,37 @@ public class WeatherHeaderModel implements RealmModel {
                 '}';
     }
 
+    public double getMinTemp() {
+        return minTemp;
+    }
+
+    public void setMinTemp(double minTemp) {
+        this.minTemp = minTemp;
+    }
+
+    @Override
+    public void save() {
+        RushCore.getInstance().save(this);
+    }
+
+    @Override
+    public void save(RushCallback callback) {
+        RushCore.getInstance().save(this, callback);
+    }
+
+    @Override
+    public void delete() {
+        RushCore.getInstance().delete(this);
+    }
+
+    @Override
+    public void delete(RushCallback callback) {
+        RushCore.getInstance().delete(this, callback);
+    }
+
+    @Override
+    public String getId() {
+        return RushCore.getInstance().getId(this);
+    }
 
 }

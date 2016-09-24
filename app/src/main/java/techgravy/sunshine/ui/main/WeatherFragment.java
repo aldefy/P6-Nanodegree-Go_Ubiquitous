@@ -14,11 +14,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
 import butterknife.BindString;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.Realm;
-import io.realm.RealmResults;
+import co.uk.rushorm.core.RushSearch;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -43,13 +42,13 @@ import static techgravy.sunshine.BuildConfig.API_KEY;
  * Created by aditlal on 12/04/16.
  */
 public class WeatherFragment extends Fragment implements WeatherClickInterface {
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     PreferenceManager preferenceManager;
     GetForecastApi getForecastApi;
     WeekRVAdapter adapter;
     List<WeatherForecastModel> forecastList;
-    @Bind(R.id.emptyTextView)
+    @BindView(R.id.emptyTextView)
     TextView emptyTextView;
     @BindString(R.string.forecast_empty)
     String forecastEmpty;
@@ -108,84 +107,59 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
 
         getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
         initSubscriber();
-        fetchWeatherFromServer();
-        // callDBFirst();
+        // fetchWeatherFromServer();
+        callDBFirst();
         checkAdapterIsEmpty(forecastEmpty);
     }
 
     private void callDBFirst() {
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(realm1 -> {
-            RealmResults<WeatherHeaderModel> results1 =
-                    realm1.where(WeatherHeaderModel.class).findAll();
-            Observable<WeatherHeaderModel> quotaObservable = Observable.create(
-                    new Observable.OnSubscribe<WeatherHeaderModel>() {
-                        @Override
-                        public void call(Subscriber<? super WeatherHeaderModel> sub) {
-                            sub.onNext(results1.first());
-                            sub.onCompleted();
-                        }
-                    }
-            );
-            quotaObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(MainApplication.getApplication().getWeatherHeaderModelSubscriber());
-        });
-        realm.executeTransaction(realm1 -> {
-            RealmResults<WeatherHeaderModel> results1 =
-                    realm1.where(WeatherHeaderModel.class).findAll();
-
-            if (results1.size() != 0) {
-                Observable<WeatherHeaderModel> quotaObservable = Observable.create(
-                        new Observable.OnSubscribe<WeatherHeaderModel>() {
-                            @Override
-                            public void call(Subscriber<? super WeatherHeaderModel> sub) {
-                                sub.onNext(results1.first());
-                                realm.executeTransaction(realm1 -> realm1.copyToRealm(results1.first()));
-                                sub.onCompleted();
-                            }
-                        }
-                );
-                quotaObservable
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(MainApplication.getApplication().getWeatherHeaderModelSubscriber());
-            } else {
-                Timber.tag("Headersubscriber").d("Size is zero");
-
-            }
-        });
-
-        realm.executeTransaction(realm1 -> {
-            RealmResults<WeatherResponse> results1 =
-                    realm1.where(WeatherResponse.class).findAll();
-
-            if (results1.size() != 0) {
-                WeatherResponse weatherResponse = results1.get(0);
-                weatherResponseSubscriber.onNext(weatherResponse);
-                weatherResponseSubscriber.onCompleted(); // Nothing more to emit
-            } else
-                fetchWeatherFromServer();
-        });
-
-
-       /* new RushSearch().find(WeatherResponse.class, list -> {
-            if (list != null)
+        List<WeatherResponse> list = new RushSearch().find(WeatherResponse.class);
+        getActivity().runOnUiThread(() -> {
+            if (list != null) {
                 if (list.size() > 0) {
                     Timber.tag("rushSaved").d(list.get(0).toString());
+
                     weatherResponseSubscriber.onNext(list.get(0));
                     weatherResponseSubscriber.onCompleted(); // Nothing more to emit
+
+               /* weatherResponseSubscriber.onNext(list.get(0));
+                weatherResponseSubscriber.onCompleted(); // Nothing more to emit*/
                 } else {
                     weatherResponseSubscriber.onError(new Throwable("No saved response"));
                     fetchWeatherFromServer();
                 }
-            else {
+            } else {
                 weatherResponseSubscriber.onError(new Throwable("No saved response"));
                 fetchWeatherFromServer();
             }
-        });*/
+        });
 
+      /*  getActivity().runOnUiThread(() -> {
+            new RushSearch().find(WeatherResponse.class, list -> {
+                if (Looper.myLooper() == Looper.getMainLooper())
+                    Timber.tag("rushSavedThread").d("its main thread");
+                else
+                    Timber.tag("rushSavedThread").d("its not main thread");
+                if (list != null)
+                    if (list.size() > 0) {
+                        Timber.tag("rushSaved").d(list.get(0).toString());
+
+                        weatherResponseSubscriber.onNext(list.get(0));
+                        weatherResponseSubscriber.onCompleted(); // Nothing more to emit
+
+                   *//* weatherResponseSubscriber.onNext(list.get(0));
+                    weatherResponseSubscriber.onCompleted(); // Nothing more to emit*//*
+                    } else {
+                        weatherResponseSubscriber.onError(new Throwable("No saved response"));
+                        fetchWeatherFromServer();
+                    }
+                else {
+                    weatherResponseSubscriber.onError(new Throwable("No saved response"));
+                    fetchWeatherFromServer();
+                }
+            });
+        });
+*/
 
     }
 
@@ -266,8 +240,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(weatherResponse -> {
-
-
+                    weatherResponse.save();
+                    Timber.tag("rushSaved").d("weather = " + weatherResponse.toString());
                    /* realm.beginTransaction();
                     realm.deleteAll();
                     realm.commitTransaction();*/
@@ -280,10 +254,11 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                     });*/
                     // Get a Realm instance for this thread
                     // All writes must be wrapped in a transaction to facilitate safe multi threading
-                    for (int i = 0; i < weatherResponse.getList().size(); i++) {
+                    /*for (int i = 0; i < weatherResponse.getList().size(); i++) {
                         WeatherForecastModel forecastModel = weatherResponse.getList().get(i);
-                        forecastModel.setId(i);
-                    }
+                        forecastModel.save();
+                        //  forecastModel.setId(i);
+                    }*/
                     /*realm.executeTransaction(realm1 -> {
                         realm1.copyToRealm(weatherResponse);
                     });*/
@@ -310,7 +285,6 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
         weatherResponseSubscriber.unsubscribe();
     }
 

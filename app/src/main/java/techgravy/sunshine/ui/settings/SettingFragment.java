@@ -1,6 +1,7 @@
 package techgravy.sunshine.ui.settings;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,8 +24,8 @@ import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.meteocons_typeface_library.Meteoconcs;
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
-import butterknife.Bind;
 import butterknife.BindString;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Subscription;
 import techgravy.sunshine.MainApplication;
@@ -39,21 +40,50 @@ import timber.log.Timber;
 
 public class SettingFragment extends Fragment {
 
-    @Bind(R.id.weather_settings_option1)
+    @BindView(R.id.weather_settings_option1)
     RelativeLayout weatherNotificationLayout;
-    @Bind(R.id.weather_notifications_checkbox)
+    @BindView(R.id.weather_notifications_checkbox)
     CheckBox weatherNotificationCheckbox;
-    @Bind(R.id.weather_settings_option2)
+    @BindView(R.id.weather_settings_option2)
     RelativeLayout weatherTempUnitsLayout;
-    @Bind(R.id.weather_settings_option4)
+    @BindView(R.id.weather_settings_option4)
     RelativeLayout weatherIconsLayout;
-    @Bind(R.id.temperature_units_value)
+    @BindView(R.id.temperature_units_value)
     TextView tempUnitValueTextView;
-    @Bind(R.id.weather_icon_value)
+    @BindView(R.id.weather_icon_value)
     TextView iconPackValueTextView;
-    @Bind(R.id.weather_icon_image)
+    @BindView(R.id.weather_icon_image)
     ImageButton weatherIconImage;
-
+    @BindView(R.id.weatherSettingsHeader)
+    TextView weatherSettingsHeader;
+    @BindView(R.id.weather_notifications_title)
+    TextView weatherNotificationsTitle;
+    @BindView(R.id.divider1)
+    View divider1;
+    @BindView(R.id.temperature_units_heading)
+    TextView temperatureUnitsHeading;
+    @BindView(R.id.divider2)
+    View divider2;
+    @BindView(R.id.weather_location_heading)
+    TextView weatherLocationHeading;
+    @BindView(R.id.weather_location_value)
+    TextView weatherLocationValue;
+    @BindView(R.id.gpsLocationButton)
+    ImageButton gpsLocationButton;
+    @BindView(R.id.weather_settings_option3)
+    RelativeLayout weatherSettingsOption3;
+    @BindView(R.id.divider3)
+    View divider3;
+    @BindView(R.id.weather_icon_heading)
+    TextView weatherIconHeading;
+    @BindView(R.id.divider4)
+    View divider4;
+    @BindView(R.id.photo_heading)
+    TextView photoHeading;
+    @BindView(R.id.photo_setting_layout)
+    RelativeLayout photoSettingLayout;
+    @BindView(R.id.divider5)
+    View divider5;
     @BindString(R.string.value_units_imperial)
     String unit_imperial;
     @BindString(R.string.value_units_metric)
@@ -63,43 +93,11 @@ public class SettingFragment extends Fragment {
     String icon_default;
     @BindString(R.string.icon_pack_meteoconcs)
     String icon_meteoconcs;
-    int tempUnitType = 1, iconPackType = 2;
 
-
-    private Subscription notificationClickSubscription, notificationCheckboxSubscription, unitsClickSubscription, iconPackClickSubscription, changePhotoClickSubscription;
-    PreferenceManager preferenceManager;
-
-    SettingsRefreshInterface settingsRefreshInterface;
-    @Bind(R.id.weatherSettingsHeader)
-    TextView weatherSettingsHeader;
-    @Bind(R.id.weather_notifications_title)
-    TextView weatherNotificationsTitle;
-    @Bind(R.id.divider1)
-    View divider1;
-    @Bind(R.id.temperature_units_heading)
-    TextView temperatureUnitsHeading;
-    @Bind(R.id.divider2)
-    View divider2;
-    @Bind(R.id.weather_location_heading)
-    TextView weatherLocationHeading;
-    @Bind(R.id.weather_location_value)
-    TextView weatherLocationValue;
-    @Bind(R.id.gpsLocationButton)
-    ImageButton gpsLocationButton;
-    @Bind(R.id.weather_settings_option3)
-    RelativeLayout weatherSettingsOption3;
-    @Bind(R.id.divider3)
-    View divider3;
-    @Bind(R.id.weather_icon_heading)
-    TextView weatherIconHeading;
-    @Bind(R.id.divider4)
-    View divider4;
-    @Bind(R.id.photo_heading)
-    TextView photoHeading;
-    @Bind(R.id.photo_setting_layout)
-    RelativeLayout photoSettingLayout;
-    @Bind(R.id.divider5)
-    View divider5;
+    private int tempUnitType = 1, iconPackType = 2;
+    private Subscription notificationClickSubscription, notificationCheckboxSubscription, unitsClickSubscription, iconPackClickSubscription, changePhotoClickSubscription , locationClickSubscription;
+    private PreferenceManager preferenceManager;
+    private SettingsRefreshInterface settingsRefreshInterface;
 
     @Override
     public void onAttach(Context context) {
@@ -123,6 +121,7 @@ public class SettingFragment extends Fragment {
         unitsClickSubscription = RxView.clicks(weatherTempUnitsLayout).subscribe(v -> handleTemperatureUnits());
         iconPackClickSubscription = RxView.clicks(weatherIconsLayout).subscribe(v -> handleIconPack());
         changePhotoClickSubscription = RxView.clicks(photoSettingLayout).subscribe(v -> handlePhotoChange());
+        locationClickSubscription = RxView.clicks(weatherSettingsOption3).subscribe(v -> handleLocation());
 
         if (preferenceManager.getUnit().equalsIgnoreCase(unit_imperial)) {
             tempUnitValueTextView.setText(unit_imperial);
@@ -143,6 +142,10 @@ public class SettingFragment extends Fragment {
                     .sizeDp(24));
         }
         return rootView;
+    }
+
+    private void handleLocation() {
+        getActivity().startActivity(new Intent(getActivity(),SettingsLocationActivity.class));
     }
 
     private void handlePhotoChange() {
@@ -241,6 +244,5 @@ public class SettingFragment extends Fragment {
         notificationCheckboxSubscription.unsubscribe();
         iconPackClickSubscription.unsubscribe();
         unitsClickSubscription.unsubscribe();
-        ButterKnife.unbind(this);
     }
 }

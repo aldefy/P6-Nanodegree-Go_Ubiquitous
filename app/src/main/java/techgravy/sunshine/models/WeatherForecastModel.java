@@ -3,21 +3,19 @@ package techgravy.sunshine.models;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
-import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.RealmClass;
+import co.uk.rushorm.core.Rush;
+import co.uk.rushorm.core.RushCallback;
+import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.annotations.RushList;
+
 
 /**
  * Created by aditlal on 06/04/16.
  */
-@RealmClass
-public class WeatherForecastModel implements RealmModel, Serializable {
+public class WeatherForecastModel implements Serializable, Rush {
 
-    @PrimaryKey
-    private int id;
 
     @SerializedName("clouds")
     private float clouds;
@@ -38,7 +36,8 @@ public class WeatherForecastModel implements RealmModel, Serializable {
     private float deg;
 
     @SerializedName("weather")
-    private RealmList<Weather> weather;
+    @RushList(classType = Weather.class)
+    private ArrayList<Weather> weather;
 
     @SerializedName("temp")
     private Temperature temp;
@@ -78,11 +77,11 @@ public class WeatherForecastModel implements RealmModel, Serializable {
         this.deg = deg;
     }
 
-    public List<Weather> getWeather() {
+    public ArrayList<Weather> getWeather() {
         return weather;
     }
 
-    public void setWeather(RealmList<Weather> weather) {
+    public void setWeather(ArrayList<Weather> weather) {
         this.weather = weather;
     }
 
@@ -110,13 +109,6 @@ public class WeatherForecastModel implements RealmModel, Serializable {
         this.dt = dt;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Override
     public String toString() {
@@ -166,4 +158,28 @@ public class WeatherForecastModel implements RealmModel, Serializable {
         weather = myList;
     }*/
 
+    @Override
+    public void save() {
+        RushCore.getInstance().save(this);
+    }
+
+    @Override
+    public void save(RushCallback callback) {
+        RushCore.getInstance().save(this, callback);
+    }
+
+    @Override
+    public void delete() {
+        RushCore.getInstance().delete(this);
+    }
+
+    @Override
+    public void delete(RushCallback callback) {
+        RushCore.getInstance().delete(this, callback);
+    }
+
+    @Override
+    public String getId() {
+        return RushCore.getInstance().getId(this);
+    }
 }

@@ -49,5 +49,6 @@
     <string name="content_authority">techgravy.sunshine</string>
     <string name="crash_toast_text">App crashed</string>
     <string name="random_photo_setting_tag">Change Photo background</string>
+    <string name="action_sync">Sync</string>
 
 </resources>

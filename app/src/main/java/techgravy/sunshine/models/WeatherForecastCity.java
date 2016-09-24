@@ -4,14 +4,15 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-import io.realm.RealmModel;
-import io.realm.annotations.RealmClass;
+import co.uk.rushorm.core.Rush;
+import co.uk.rushorm.core.RushCallback;
+import co.uk.rushorm.core.RushCore;
+
 
 /**
  * Created by aditlal on 06/04/16.
  */
-@RealmClass
-public class WeatherForecastCity implements RealmModel, Serializable {
+public class WeatherForecastCity implements  Serializable ,Rush {
 
     private Coord coord;
 
@@ -72,5 +73,28 @@ public class WeatherForecastCity implements RealmModel, Serializable {
         return "ClassPojo [coord = " + coord + ", mId = " + mId + ", name = " + name + ", population = " + population + ", country = " + country + "]";
     }
 
+    @Override
+    public void save() {
+        RushCore.getInstance().save(this);
+    }
 
+    @Override
+    public void save(RushCallback callback) {
+        RushCore.getInstance().save(this, callback);
+    }
+
+    @Override
+    public void delete() {
+        RushCore.getInstance().delete(this);
+    }
+
+    @Override
+    public void delete(RushCallback callback) {
+        RushCore.getInstance().delete(this, callback);
+    }
+
+    @Override
+    public String getId() {
+        return RushCore.getInstance().getId(this);
+    }
 }

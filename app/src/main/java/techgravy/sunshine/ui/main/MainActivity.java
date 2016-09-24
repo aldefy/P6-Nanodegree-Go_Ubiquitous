@@ -6,6 +6,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.AppBarLayout.OnOffsetChangedListener;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -26,9 +27,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.mikepenz.iconics.context.IconicsLayoutInflater;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -43,47 +52,52 @@ import techgravy.sunshine.models.PhotoResponse;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.sync.SunshineSyncAdapter;
+import techgravy.sunshine.sync.WearableDataService;
 import techgravy.sunshine.ui.settings.SettingFragment;
 import techgravy.sunshine.ui.settings.SettingsRefreshInterface;
 import techgravy.sunshine.utils.CommonUtils;
 import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements SettingsRefreshInterface, WeatherDetailInterface {
+import static techgravy.sunshine.helpers.Constants.DISPLACEMENT;
+import static techgravy.sunshine.helpers.Constants.FATEST_INTERVAL;
+import static techgravy.sunshine.helpers.Constants.PLAY_SERVICES_RESOLUTION_REQUEST;
+import static techgravy.sunshine.helpers.Constants.UPDATE_INTERVAL;
+
+public class MainActivity extends AppCompatActivity implements SettingsRefreshInterface, WeatherDetailInterface, ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
 
-    @Bind(R.id.aboutImageBackground)
+    @BindView(R.id.aboutImageBackground)
     ImageView aboutImageBackground;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.collapsing_toolbar)
+    @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
-    @Bind(R.id.app_bar_layout)
+    @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
-    GetPhotoApi getPhotoApi;
-    @Bind(R.id.weatherCityTextView)
+    @BindView(R.id.weatherCityTextView)
     TextView weatherCityTextView;
-    @Bind(R.id.weatherHeadlineTextView)
+    @BindView(R.id.weatherHeadlineTextView)
     TextView weatherHeadlineTextView;
-    @Bind(R.id.weatherSubHeadTextView)
+    @BindView(R.id.weatherSubHeadTextView)
     TextView weatherSubHeadTextView;
-    @Bind(R.id.weatherHumidityTitleTextView)
+    @BindView(R.id.weatherHumidityTitleTextView)
     TextView weatherHumidityTitleTextView;
-    @Bind(R.id.weatherHumidityValueTextView)
+    @BindView(R.id.weatherHumidityValueTextView)
     TextView weatherHumidityValueTextView;
-    @Bind(R.id.weatherPressureTitleTextView)
+    @BindView(R.id.weatherPressureTitleTextView)
     TextView weatherPressureTitleTextView;
-    @Bind(R.id.weatherPressureValueTextView)
+    @BindView(R.id.weatherPressureValueTextView)
     TextView weatherPressureValueTextView;
-    @Bind(R.id.weatherDetailsLayout)
+    @BindView(R.id.weatherDetailsLayout)
     LinearLayout weatherDetailsLayout;
-    @Bind(R.id.weatherWindTitleTextView)
+    @BindView(R.id.weatherWindTitleTextView)
     TextView weatherWindTitleTextView;
-    @Bind(R.id.weatherWindValueTextView)
+    @BindView(R.id.weatherWindValueTextView)
     TextView weatherWindValueTextView;
-    @Bind(R.id.fragmentContainer)
+    @BindView(R.id.fragmentContainer)
     FrameLayout fragmentContainer;
-    @Bind(R.id.photoCredit)
+    @BindView(R.id.photoCredit)
     TextView photoCredit;
 
     private WeatherHeaderModel headerModel;
@@ -91,11 +105,16 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
     private PreferenceManager preferenceManager;
+    private GetPhotoApi getPhotoApi;
+    // boolean flag to toggle periodic location updates
+    private boolean mRequestingLocationUpdates = false;
 
     WeatherFragment weatherFragment;
-    SettingFragment settingFragment;
     WeatherDetailFragment detailFragment;
     PhotoResponse photoResponse;
+    GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +133,16 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
             photoCredit.setText("Photo Credit : " + photoResponse.getPhotos().get(0).getUserModel().getFullname());
             aboutImageBackground.setTag(photoResponse.getPhotos().get(0).getUrl());
         }
+        init();
         initViews();
+    }
+
+    private void init() {
+        if (checkPlayServices()) {
+            // Building the GoogleApi client
+            buildGoogleApiClient();
+            createLocationRequest();
+        }
     }
 
     private void initViews() {
@@ -226,6 +254,11 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
         weatherHumidityValueTextView.setText(weatherHeaderModel.getHumidity());
         weatherPressureValueTextView.setText(weatherHeaderModel.getPressure());
         weatherWindValueTextView.setText(weatherHeaderModel.getWind());
+
+        WearableDataService sunshineWearableConnector = new WearableDataService(MainActivity.this);
+        sunshineWearableConnector.onNotifyWearable(weatherHeaderModel.getWeatherId(),
+                CommonUtils.formatTemperature(MainActivity.this, weatherHeaderModel.getTemp(), preferenceManager.getUnit()),
+                CommonUtils.formatTemperature(MainActivity.this, weatherHeaderModel.getMinTemp(), preferenceManager.getUnit()));
     }
 
     private void getHeaderImage() {
@@ -313,6 +346,8 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.action_sync:
+                SunshineSyncAdapter.syncImmediately(MainActivity.this);
             default:
                 return true;
         }
@@ -351,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
         fragmentTransaction = fragmentManager.beginTransaction();
         detailFragment = new WeatherDetailFragment();
         Bundle extras = new Bundle();
-        extras.putInt("forecastId", model.getId());
+        extras.putSerializable("forecast", model);
         detailFragment.setArguments(extras);
         fragmentTransaction.add(R.id.fragmentContainer, detailFragment, "details");
         fragmentTransaction.commit();
@@ -377,6 +412,153 @@ public class MainActivity extends AppCompatActivity implements SettingsRefreshIn
             super.onBackPressed();
         else
             openHome();
+    }
+
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    /*
+    Location Interface Methods
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Resuming the periodic location updates
+        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+       // stopLocationUpdates();
+    }
+
+    /**
+     * Method to toggle periodic location updates
+     */
+    private void togglePeriodicLocationUpdates() {
+        if (!mRequestingLocationUpdates) {
+            mRequestingLocationUpdates = true;
+            // Starting the location updates
+            startLocationUpdates();
+            Timber.d("Periodic location updates started!");
+
+        } else {
+            mRequestingLocationUpdates = false;
+            // Stopping the location updates
+            stopLocationUpdates();
+            Timber.d("Periodic location updates stopped!");
+        }
+    }
+
+    /**
+     * Creating location request object
+     */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT); // 10 meters
+    }
+
+    /**
+     * Starting the location updates
+     */
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    /**
+     * Stopping location updates
+     */
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
+    /**
+     * Creating google api client object
+     */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
+
+    /**
+     * Method to verify google play services on the device
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        int result = googleAPI.isGooglePlayServicesAvailable(this);
+        if (result != ConnectionResult.SUCCESS) {
+            if (googleAPI.isUserResolvableError(result)) {
+                googleAPI.getErrorDialog(this, result,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Method to display the location on UI
+     */
+    private void displayLocation() {
+
+        mLastLocation = LocationServices.FusedLocationApi
+                .getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+
+            //TODO update local variable and store location
+
+        } else {
+            //TODO update local variable and store location
+        }
+    }
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        // Once connected with google api, get the location
+        displayLocation();
+
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        //TODO update local variable and store location
+
     }
 }
 

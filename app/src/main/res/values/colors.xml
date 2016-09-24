@@ -23,6 +23,5 @@
     <color name="btn_default_light_pressed">#FFFFFF</color>
     <color name="forecast_high">#00BCD4</color>
     <color name="windowBackground">#545454</color>
-    <color name="white">#FFFFFF</color>
 
 </resources>

@@ -14,9 +14,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.Realm;
 import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
 import techgravy.sunshine.models.WeatherForecastModel;
@@ -30,83 +29,82 @@ import timber.log.Timber;
 public class WeatherDetailFragment extends Fragment {
 
 
-    @Bind(R.id.aboutImageBackground)
+    @BindView(R.id.aboutImageBackground)
     ImageView aboutImageBackground;
-    @Bind(R.id.alphaView)
+    @BindView(R.id.alphaView)
     View alphaView;
-    @Bind(R.id.weatherCityTextView)
+    @BindView(R.id.weatherCityTextView)
     TextView weatherCityTextView;
-    @Bind(R.id.weatherDateTextView)
+    @BindView(R.id.weatherDateTextView)
     TextView weatherDateTextView;
-    @Bind(R.id.weatherHeadlineTextView)
+    @BindView(R.id.weatherHeadlineTextView)
     TextView weatherHeadlineTextView;
-    @Bind(R.id.weatherSubHeadTextView)
+    @BindView(R.id.weatherSubHeadTextView)
     TextView weatherSubHeadTextView;
-    @Bind(R.id.temperatureHeading)
+    @BindView(R.id.temperatureHeading)
     TextView temperatureHeading;
-    @Bind(R.id.tempDivider)
+    @BindView(R.id.tempDivider)
     View tempDivider;
-    @Bind(R.id.morningTimeLabel)
+    @BindView(R.id.morningTimeLabel)
     TextView morningTimeLabel;
-    @Bind(R.id.morningTimeTemp)
+    @BindView(R.id.morningTimeTemp)
     TextView morningTimeTemp;
-    @Bind(R.id.afternoonTimeLabel)
+    @BindView(R.id.afternoonTimeLabel)
     TextView afternoonTimeLabel;
-    @Bind(R.id.afternoonTimeTemp)
+    @BindView(R.id.afternoonTimeTemp)
     TextView afternoonTimeTemp;
-    @Bind(R.id.eveningTimeLabel)
+    @BindView(R.id.eveningTimeLabel)
     TextView eveningTimeLabel;
-    @Bind(R.id.eveningTimeTemp)
+    @BindView(R.id.eveningTimeTemp)
     TextView eveningTimeTemp;
-    @Bind(R.id.nightTimeLabel)
+    @BindView(R.id.nightTimeLabel)
     TextView nightTimeLabel;
-    @Bind(R.id.nightTimeTemp)
+    @BindView(R.id.nightTimeTemp)
     TextView nightTimeTemp;
-    @Bind(R.id.weatherTemperatureLayout)
+    @BindView(R.id.weatherTemperatureLayout)
     LinearLayout weatherTemperatureLayout;
-    @Bind(R.id.othersHeading)
+    @BindView(R.id.othersHeading)
     TextView othersHeading;
-    @Bind(R.id.otherDivider)
+    @BindView(R.id.otherDivider)
     View otherDivider;
-    @Bind(R.id.weatherHumidityTitleTextView)
+    @BindView(R.id.weatherHumidityTitleTextView)
     TextView weatherHumidityTitleTextView;
-    @Bind(R.id.weatherHumidityValueTextView)
+    @BindView(R.id.weatherHumidityValueTextView)
     TextView weatherHumidityValueTextView;
-    @Bind(R.id.weatherHumidityDetailsLayout)
+    @BindView(R.id.weatherHumidityDetailsLayout)
     LinearLayout weatherHumidityDetailsLayout;
-    @Bind(R.id.weatherPressureTitleTextView)
+    @BindView(R.id.weatherPressureTitleTextView)
     TextView weatherPressureTitleTextView;
-    @Bind(R.id.weatherPressureValueTextView)
+    @BindView(R.id.weatherPressureValueTextView)
     TextView weatherPressureValueTextView;
-    @Bind(R.id.weatherPressureDetailsLayout)
+    @BindView(R.id.weatherPressureDetailsLayout)
     LinearLayout weatherPressureDetailsLayout;
-    @Bind(R.id.weatherWindTitleTextView)
+    @BindView(R.id.weatherWindTitleTextView)
     TextView weatherWindTitleTextView;
-    @Bind(R.id.weatherWindValueTextView)
+    @BindView(R.id.weatherWindValueTextView)
     TextView weatherWindValueTextView;
-    @Bind(R.id.weatherWindDetailsLayout)
+    @BindView(R.id.weatherWindDetailsLayout)
     LinearLayout weatherWindDetailsLayout;
-    @Bind(R.id.nestedScrollView)
+    @BindView(R.id.nestedScrollView)
     NestedScrollView nestedScrollView;
     private WeatherForecastModel forecast;
     private PreferenceManager preferenceManager;
     private ActionProvider mShareActionProvider;
-    Realm realm;
-    int forecastId;
+    //int forecastId;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        realm = Realm.getDefaultInstance();
+      //  realm = Realm.getDefaultInstance();
         handleArgs();
         setHasOptionsMenu(true);
     }
 
     private void handleArgs() {
         Bundle extras = getArguments();
-        forecastId = extras.getInt("forecastId");
-        Timber.tag("DetailsID").d(forecastId + "");
+        forecast = (WeatherForecastModel) extras.getSerializable("forecast");
+        Timber.tag("Details").d(forecast + "");
     }
 
     @Nullable
@@ -115,12 +113,13 @@ public class WeatherDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
         ButterKnife.bind(this, rootView);
         preferenceManager = MainApplication.getApplication().getPreferenceManager();
-        realm.executeTransaction(realm1 -> {
+        initViews();
+       /* realm.executeTransaction(realm1 -> {
             Timber.tag("DetailsID").d(forecastId + "");
 
             forecast = realm1.where(WeatherForecastModel.class).equalTo("id", forecastId).findFirst();
             if (forecast != null) initViews();
-        });
+        });*/
         return rootView;
     }
 
@@ -156,7 +155,6 @@ public class WeatherDetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
     }
 
     @Override

@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import techgravy.sunshine.R;
 import techgravy.sunshine.interfaces.WeatherClickInterface;
@@ -72,15 +72,15 @@ public class WeekRVAdapter extends RecyclerView.Adapter<WeekRVAdapter.WeatherVie
 
 
     static class WeatherViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.list_item_icon)
+        @BindView(R.id.list_item_icon)
         ImageView listItemIcon;
-        @Bind(R.id.list_item_date_textview)
+        @BindView(R.id.list_item_date_textview)
         TextView listItemDateTextview;
-        @Bind(R.id.list_item_forecast_textview)
+        @BindView(R.id.list_item_forecast_textview)
         TextView listItemForecastTextview;
-        @Bind(R.id.list_item_high_textview)
+        @BindView(R.id.list_item_high_textview)
         TextView listItemHighTextview;
-        @Bind(R.id.list_item_low_textview)
+        @BindView(R.id.list_item_low_textview)
         TextView listItemLowTextview;
         WeatherClickInterface weatherClickInterface;
 
