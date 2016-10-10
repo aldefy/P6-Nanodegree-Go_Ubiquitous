@@ -107,8 +107,10 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
 
         getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
         initSubscriber();
+        fetchWeatherFromServer();
+
         // fetchWeatherFromServer();
-        callDBFirst();
+      //  callDBFirst();
         checkAdapterIsEmpty(forecastEmpty);
     }
 

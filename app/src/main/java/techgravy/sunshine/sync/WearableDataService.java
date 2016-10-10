@@ -31,7 +31,7 @@ public class WearableDataService extends WearableListenerService
     private int weatherId = 0;
     private String tempH, tempL, location;
 
-    public static String WEATHER_DATA_PATH = "/today-weather-data";
+    public static String WEATHER_DATA_PATH = "/weather-update";
 
 
     public WearableDataService(Context context) {
@@ -60,8 +60,8 @@ public class WearableDataService extends WearableListenerService
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_DATA_PATH);
             putDataMapRequest.setUrgent();
             putDataMapRequest.getDataMap().putInt("weatherId", weatherId);
-            putDataMapRequest.getDataMap().putString("high", tempH);
-            putDataMapRequest.getDataMap().putString("low", tempL);
+            putDataMapRequest.getDataMap().putString("max-temp", tempH);
+            putDataMapRequest.getDataMap().putString("min-temp", tempL);
             putDataMapRequest.getDataMap().putString("location", "");
             putDataMapRequest.getDataMap().putLong("time", System.currentTimeMillis());
 
@@ -96,7 +96,7 @@ public class WearableDataService extends WearableListenerService
         Log.d(TAG, "message path: " + path);
 
         // Check to see if the message is a request for the updated weather conditions
-        if (path.equals("/today-weather-data")) {
+        if (path.equals("/weather-update")) {
             // start the service sending the updated weather condition to the wearable
             Context context = this.getApplicationContext();
             SunshineSyncAdapter.syncImmediately(context);
