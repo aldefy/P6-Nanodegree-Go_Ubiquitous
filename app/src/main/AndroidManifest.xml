@@ -83,7 +83,14 @@
             android:authorities="@string/content_authority"
             android:exported="false"
             android:syncable="true"/>
-
+        <!--<service
+            android:name=".sync.WearableDataService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+            </intent-filter>
+        </service>-->
     </application>
 
 </manifest>

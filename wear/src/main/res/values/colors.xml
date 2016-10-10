@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#000088</color>
-    <color name="digital_text">#ffffff</color>
+   <!-- <color name="background">#000088</color>-->
+<!--    <color name="digital_text">#ffffff</color>
     <color name="digital_temp">#faf314</color>
+
+
+    <color name="text">#ffffff</color>
+    <color name="text_semitransparent">#80ffffff</color>
+    <color name="background">#1ca7f3</color>
+    <color name="background_ambient">#000000</color>-->
 </resources>

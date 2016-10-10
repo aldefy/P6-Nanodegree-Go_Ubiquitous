@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha1'
+        classpath 'com.android.tools.build:gradle:2.2.0'
 
         //RetroLambda
         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
@@ -14,8 +14,6 @@ buildscript {
         //Dagger 2
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
-        //Realm Gradle Plugin
-        classpath "io.realm:realm-gradle-plugin:1.0.0"
     }
 }
 

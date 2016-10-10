@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="time_text_size">40dp</dimen>
+<!--    <dimen name="time_text_size">40dp</dimen>
     <dimen name="time_text_size_round">35dp</dimen>
     <dimen name="time_y_offset">90dp</dimen>
 
@@ -17,4 +17,13 @@
     <dimen name="weather_icon_heigh">30dp</dimen>
     <dimen name="weather_icon_y_offset">220px</dimen>
     <dimen name="weather_icon_x_offset_Increment">20px</dimen>
+
+
+
+
+    <dimen name="text_size_time">45dp</dimen>
+    <dimen name="text_size_date">15dp</dimen>
+    <dimen name="text_size_temperature">30dp</dimen>
+    <dimen name="text_size_temperature_small">23dp</dimen>
+    <dimen name="text_size_location">10dp</dimen>-->
 </resources>
