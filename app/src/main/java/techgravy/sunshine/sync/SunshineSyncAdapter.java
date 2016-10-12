@@ -18,7 +18,6 @@ import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
 import techgravy.sunshine.api.ForecastApiGenerator;
 import techgravy.sunshine.api.GetForecastApi;
-import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.utils.CommonUtils;
@@ -29,17 +28,17 @@ import static techgravy.sunshine.BuildConfig.API_KEY;
 
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
-    public static final String LOG_TAG = "SunshineAdapterTag";
-    public static final String ACTION_DATA_UPDATED =
+    private static final String LOG_TAG = "SunshineAdapterTag";
+    private static final String ACTION_DATA_UPDATED =
             "techgravy.sunshine.ACTION_DATA_UPDATED";
     private GetForecastApi getForecastApi;
     private PreferenceManager preferenceManager;
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60 * 180;
-    public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+    private static final int SYNC_INTERVAL = 60 * 180;
+    private static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
-    Context context;
+    private Context context;
 
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
@@ -55,30 +54,14 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void fetchWeatherFromServer() {
-        Timber.tag("Calling").d("Calling Api");
+        Timber.tag(LOG_TAG).d("Calling Api");
         preferenceManager = MainApplication.getApplication().getPreferenceManager();
         getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
         Context context = getContext();
         getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY).subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .map(weatherResponse -> {
-                    // response.save();
-                   /* realm.beginTransaction();
-                    realm.deleteAll();
-                    realm.commitTransaction();*/
-                    // Get a Realm instance for this thread
-                    for (int i = 0; i < weatherResponse.getList().size(); i++) {
-                        WeatherForecastModel forecastModel = weatherResponse.getList().get(i);
-                        //  forecastModel.setId(i);
-                    }
-                    // All writes must be wrapped in a transaction to facilitate safe multi threading
-                   /* realm.executeTransaction(realm1 -> {
-                        // All writes must be wrapped in a transaction to facilitate safe multi threading
-                        realm.executeTransaction(realm2 -> {
-                            realm1.copyToRealm(weatherResponse);
-
-                        });
-                    });*/
+                    weatherResponse.save(() -> Timber.tag("rushSaved").d("Saved api sync data " + weatherResponse.hashCode()));
                     WeatherHeaderModel model = new WeatherHeaderModel();
                     model.setCity(weatherResponse.getCity().getName());
                     model.setHumidity(context.getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
@@ -98,7 +81,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     model.setMinTemp(weatherResponse.getList().get(0).getTemp().getMin());
                     model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
                     model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(context, weatherResponse.getList().get(0).getWeather().get(0).getmId()));
-                    Timber.tag("Headersubscriber").d(model.toString());
+                    Timber.tag(LOG_TAG).d(model.toString());
                     WearableDataService sunshineWearableConnector = new WearableDataService(getContext());
                     sunshineWearableConnector.onNotifyWearable(model.getWeatherId(),
                             CommonUtils.formatTemperature(context, model.getTemp(), preferenceManager.getUnit()),

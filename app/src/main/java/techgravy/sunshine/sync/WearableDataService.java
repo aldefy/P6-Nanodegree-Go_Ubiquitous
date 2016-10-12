@@ -19,23 +19,26 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import techgravy.sunshine.utils.PreferenceManager;
 import techgravy.sunshine.utils.logger.Logger;
 
 /**
  * This is a Service that listens and send messages to the wearable device
  */
 public class WearableDataService extends WearableListenerService
-        implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks , DataApi.DataListener {
+        implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, DataApi.DataListener {
     private static final String TAG = "onNotifyWearable";
     private GoogleApiClient mGoogleApiClient;
     private int weatherId = 0;
     private String tempH, tempL, location;
-
+    private Context context;
     public static String WEATHER_DATA_PATH = "/weather-update";
+    private PreferenceManager preferenceManager;
 
 
     public WearableDataService(Context context) {
-
+        this.context = context;
+        preferenceManager = new PreferenceManager(context);
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -72,7 +75,7 @@ public class WearableDataService extends WearableListenerService
                         if (!dataItemResult.getStatus().isSuccess()) {
                             Logger.t("onNotifyWearable").i("Error sending weather data");
                         } else {
-                            Logger.t("onNotifyWearable").i("Success sending weather data "+ dataItemResult.toString());
+                            Logger.t("onNotifyWearable").i("Success sending weather data " + dataItemResult.toString());
                         }
                     });
         }

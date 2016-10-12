@@ -82,11 +82,11 @@ public class WeatherResponse implements Serializable, Rush {
     public void save() {
         RushCore.getInstance().save(this);
         Timber.tag("rushSaved").d("weather = " + toString());
-
     }
 
     @Override
     public void save(RushCallback callback) {
+        Timber.tag("rushSaved").d("weather = " + toString());
         RushCore.getInstance().save(this, callback);
     }
 

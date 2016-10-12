@@ -86,11 +86,8 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
         View view = inflater.inflate(R.layout.fragment_weather_week, container, false);
         ButterKnife.bind(this, view);
         Timber.tag("FragmentTag").d("onCreateView");
-        // realm = Realm.getDefaultInstance();
-
+        Timber.tag("Flows").d("onCreateView");
         init();
-
-        //NotificationHelper.expandablePictureNotification(MainActivity.this, "New Notification", "http://api.randomuser.me/portraits/women/39.jpg")
         return view;
     }
 
@@ -107,19 +104,21 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
 
         getForecastApi = ForecastApiGenerator.createService(GetForecastApi.class);
         initSubscriber();
-        fetchWeatherFromServer();
+        //fetchWeatherFromServer();
 
         // fetchWeatherFromServer();
-      //  callDBFirst();
+        callDBFirst();
         checkAdapterIsEmpty(forecastEmpty);
     }
 
     private void callDBFirst() {
+        Timber.tag("Flows").d("callDBFirst");
         List<WeatherResponse> list = new RushSearch().find(WeatherResponse.class);
         getActivity().runOnUiThread(() -> {
             if (list != null) {
                 if (list.size() > 0) {
-                    Timber.tag("rushSaved").d(list.get(0).toString());
+                    Timber.tag("Flows").d("callDBFirst");
+                    Timber.tag("rushGet").d(list.get(0).toString());
 
                     weatherResponseSubscriber.onNext(list.get(0));
                     weatherResponseSubscriber.onCompleted(); // Nothing more to emit
@@ -127,46 +126,22 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                /* weatherResponseSubscriber.onNext(list.get(0));
                 weatherResponseSubscriber.onCompleted(); // Nothing more to emit*/
                 } else {
+                    Timber.tag("Flows").d("callDBFirst");
                     weatherResponseSubscriber.onError(new Throwable("No saved response"));
                     fetchWeatherFromServer();
                 }
             } else {
+                Timber.tag("Flows").d("callDBFirst");
                 weatherResponseSubscriber.onError(new Throwable("No saved response"));
                 fetchWeatherFromServer();
             }
         });
 
-      /*  getActivity().runOnUiThread(() -> {
-            new RushSearch().find(WeatherResponse.class, list -> {
-                if (Looper.myLooper() == Looper.getMainLooper())
-                    Timber.tag("rushSavedThread").d("its main thread");
-                else
-                    Timber.tag("rushSavedThread").d("its not main thread");
-                if (list != null)
-                    if (list.size() > 0) {
-                        Timber.tag("rushSaved").d(list.get(0).toString());
-
-                        weatherResponseSubscriber.onNext(list.get(0));
-                        weatherResponseSubscriber.onCompleted(); // Nothing more to emit
-
-                   *//* weatherResponseSubscriber.onNext(list.get(0));
-                    weatherResponseSubscriber.onCompleted(); // Nothing more to emit*//*
-                    } else {
-                        weatherResponseSubscriber.onError(new Throwable("No saved response"));
-                        fetchWeatherFromServer();
-                    }
-                else {
-                    weatherResponseSubscriber.onError(new Throwable("No saved response"));
-                    fetchWeatherFromServer();
-                }
-            });
-        });
-*/
-
     }
 
     private void initSubscriber() {
         Timber.tag("initSubscriber").d("init weatherResponseSubscriber");
+        Timber.tag("Flows").d("initSubscriber");
 
         weatherResponseSubscriber = new Subscriber<WeatherResponse>() {
             @Override
@@ -182,6 +157,7 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
 
             @Override
             public void onNext(WeatherResponse weatherResponse) {
+                Timber.tag("Flows").d("initSubscriber");
                 forecastList.clear();
                 forecastList.addAll(weatherResponse.getList());
                 adapter.notifyDataSetChanged();
@@ -238,34 +214,15 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
     }
 
     private void fetchWeatherFromServer() {
+        Timber.tag("Flows").d("fetchWeatherFromServer");
         getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(weatherResponse -> {
-                    weatherResponse.save();
-                    Timber.tag("rushSaved").d("weather = " + weatherResponse.toString());
-                   /* realm.beginTransaction();
-                    realm.deleteAll();
-                    realm.commitTransaction();*/
-                    /*List<WeatherResponse> objects = new RushSearch().find(WeatherResponse.class);
-                    RushCore.getInstance().delete(objects, () -> {
-                        weatherResponse.save(() -> {
-                            Timber.tag("RushSaved");
-                            Timber.d(weatherResponse.toString());
-                        });
-                    });*/
-                    // Get a Realm instance for this thread
-                    // All writes must be wrapped in a transaction to facilitate safe multi threading
-                    /*for (int i = 0; i < weatherResponse.getList().size(); i++) {
-                        WeatherForecastModel forecastModel = weatherResponse.getList().get(i);
-                        forecastModel.save();
-                        //  forecastModel.setId(i);
-                    }*/
-                    /*realm.executeTransaction(realm1 -> {
-                        realm1.copyToRealm(weatherResponse);
-                    });*/
-
-
+                    Timber.tag("Flows").d("fetchWeatherFromServer");
+                    weatherResponse.save(() -> Timber.tag("rushSaved").d("weatherResponse = " + weatherResponse.toString()));
+                    for (WeatherForecastModel model : weatherResponse.getList())
+                        model.save(() -> Timber.tag("rushSaved").d("weatherForecast = " + model.toString()));
                     return weatherResponse;
                 })
                 .subscribe(weatherResponseSubscriber);
