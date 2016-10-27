@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "340160190959",
+    "project_id": "micro-reserve-108016"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340160190959:android:fa720ebbdc5be999",
+        "android_client_info": {
+          "package_name": "techgravy.sunshine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaC-MsbhI9Sti5kbHALoMNKfBqR7wEkFk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

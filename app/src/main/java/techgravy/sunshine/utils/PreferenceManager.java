@@ -24,6 +24,15 @@ public final class PreferenceManager {
         return mSharedPreferences;
     }
 
+    public void setCity(String city) {
+        Timber.d("city = " + city);
+        mSharedPreferences.edit().putString("city", city).apply();
+    }
+
+    public String getCity() {
+        return mSharedPreferences.getString("city", "bangalore");
+    }
+
     public void setWeatherNotificationToggle(boolean notificationToggle) {
         Timber.d("notificationToggle = " + notificationToggle);
         mSharedPreferences.edit().putBoolean("notificationToggle", notificationToggle).apply();
