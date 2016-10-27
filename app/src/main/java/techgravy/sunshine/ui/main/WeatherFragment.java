@@ -168,13 +168,13 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                 model.setPressure(getActivity().getString(R.string.format_pressure, weatherResponse.getList().get(0).getPressure()));
                 int tempType = CommonUtils.calculateTimeOfDay();
                 if (tempType == CommonUtils.TIME_NIGHT)
-                    model.setTemp(weatherResponse.getList().get(0).getTemp().getNight());
+                    model.setTemp(weatherResponse.getList().get(0).getTemp() != null ? weatherResponse.getList().get(0).getTemp().getNight() : 0);
                 else if (tempType == CommonUtils.TIME_MORNING)
-                    model.setTemp(weatherResponse.getList().get(0).getTemp().getMorn());
+                    model.setTemp(weatherResponse.getList().get(0).getTemp() != null ? weatherResponse.getList().get(0).getTemp().getMorn() : 0);
                 else if (tempType == CommonUtils.TIME_DAY)
-                    model.setTemp(weatherResponse.getList().get(0).getTemp().getDay());
+                    model.setTemp(weatherResponse.getList().get(0).getTemp() != null ? weatherResponse.getList().get(0).getTemp().getDay() : 0);
                 else if (tempType == CommonUtils.TIME_EVE)
-                    model.setTemp(weatherResponse.getList().get(0).getTemp().getEve());
+                    model.setTemp(weatherResponse.getList().get(0).getTemp() != null ? weatherResponse.getList().get(0).getTemp().getEve() : 0);
                 else
                     model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
                 model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
@@ -215,7 +215,7 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
 
     private void fetchWeatherFromServer() {
         Timber.tag("Flows").d("fetchWeatherFromServer");
-        getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY)
+        getForecastApi.getWeekForecast(preferenceManager.getCity(), "json", "metric", "14", API_KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(weatherResponse -> {

@@ -1,7 +1,8 @@
 package techgravy.sunshine.ui.settings;
 
+import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,25 +21,46 @@ import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 import com.github.javiersantos.materialstyleddialogs.enums.Duration;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.meteocons_typeface_library.Meteoconcs;
 import com.mikepenz.weather_icons_typeface_library.WeatherIcons;
 
+import java.util.List;
+
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import techgravy.sunshine.MainApplication;
 import techgravy.sunshine.R;
+import techgravy.sunshine.api.LocationApiGenerator;
+import techgravy.sunshine.api.ReverseGeoCodeApi;
+import techgravy.sunshine.models.Address_components;
+import techgravy.sunshine.models.LocationModel;
 import techgravy.sunshine.utils.CommonUtils;
+import techgravy.sunshine.utils.GPSTracker;
+import techgravy.sunshine.utils.PermissionUtils;
 import techgravy.sunshine.utils.PreferenceManager;
+import techgravy.sunshine.utils.logger.Logger;
 import timber.log.Timber;
+
+import static techgravy.sunshine.BuildConfig.GOOGLE_KEY;
 
 /**
  * Created by aditlal on 05/04/16.
  */
 
-public class SettingFragment extends Fragment {
+public class SettingFragment extends Fragment implements GPSTracker.LocationUpdateInterface {
 
     @BindView(R.id.weather_settings_option1)
     RelativeLayout weatherNotificationLayout;
@@ -95,9 +117,14 @@ public class SettingFragment extends Fragment {
     String icon_meteoconcs;
 
     private int tempUnitType = 1, iconPackType = 2;
-    private Subscription notificationClickSubscription, notificationCheckboxSubscription, unitsClickSubscription, iconPackClickSubscription, changePhotoClickSubscription , locationClickSubscription;
+    private Subscription notificationClickSubscription, notificationCheckboxSubscription, unitsClickSubscription, iconPackClickSubscription, changePhotoClickSubscription, locationClickSubscription;
     private PreferenceManager preferenceManager;
     private SettingsRefreshInterface settingsRefreshInterface;
+    private GPSTracker gpsTracker;
+    private Location location;
+    private ReverseGeoCodeApi reverseGeoCodeApi;
+    private boolean isCoarseLocation, isFineLocation;
+
 
     @Override
     public void onAttach(Context context) {
@@ -112,6 +139,9 @@ public class SettingFragment extends Fragment {
         Timber.tag("Settings");
         ButterKnife.bind(this, rootView);
         preferenceManager = MainApplication.getApplication().getPreferenceManager();
+        gpsTracker = new GPSTracker(getActivity());
+        reverseGeoCodeApi = LocationApiGenerator.createService(ReverseGeoCodeApi.class);
+
         weatherNotificationCheckbox.setChecked(preferenceManager.getWeatherNotificationToggle());
         notificationCheckboxSubscription =
                 RxCompoundButton.checkedChanges(weatherNotificationCheckbox)
@@ -144,8 +174,60 @@ public class SettingFragment extends Fragment {
         return rootView;
     }
 
+
     private void handleLocation() {
-        getActivity().startActivity(new Intent(getActivity(),SettingsLocationActivity.class));
+        checkLocationPermissions();
+    }
+
+    private void checkLocationPermissions() {
+        if (Dexter.isRequestOngoing()) {
+            return;
+        }
+        Dexter.checkPermissions(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                for (PermissionGrantedResponse response : report.getGrantedPermissionResponses()) {
+                    Logger.t("PermDexter").d("Granted " + response.getPermissionName());
+                    switch (response.getPermissionName()) {
+                        case Manifest.permission.ACCESS_FINE_LOCATION:
+                            isFineLocation = true;
+                            break;
+                        case Manifest.permission.ACCESS_COARSE_LOCATION:
+                            isCoarseLocation = true;
+                            break;
+                    }
+                }
+                for (PermissionDeniedResponse response : report.getDeniedPermissionResponses()) {
+                    Logger.t("PermDexter").d("Denied " + response.getPermissionName());
+                    switch (response.getPermissionName()) {
+                        case Manifest.permission.ACCESS_FINE_LOCATION:
+                            isFineLocation = false;
+                            break;
+                        case Manifest.permission.ACCESS_COARSE_LOCATION:
+                            isCoarseLocation = false;
+                            break;
+                    }
+
+
+                }
+
+                if (isCoarseLocation && isFineLocation) {
+                    if (gpsTracker.canGetLocation()) {
+                        location = gpsTracker.getLocation();
+                        getLocationInfoForWeather();
+                    } else
+                        gpsTracker.showLocationSettingsRequest();
+
+                } //else
+                //   PermissionUtils.showPermissionDeniedToast(getActivity(), getString(R.string.location_unavailable));
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                PermissionUtils.showPermissionRationaleDialog(getActivity(), token, "Location Permission", getString(R.string.location_rationale));
+            }
+        }, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
     private void handlePhotoChange() {
@@ -245,4 +327,47 @@ public class SettingFragment extends Fragment {
         iconPackClickSubscription.unsubscribe();
         unitsClickSubscription.unsubscribe();
     }
+
+    @Override
+    public void locationUpdate(Location location) {
+        this.location = location;
+        getLocationInfoForWeather();
+    }
+
+    private void getLocationInfoForWeather() {
+        if (location != null)
+            reverseGeoCodeApi.getStateCityFromLocation(location.getLatitude() + "," + location.getLongitude(), GOOGLE_KEY)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Subscriber<LocationModel>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onNext(LocationModel locationModel) {
+                            String city = "";
+                            List<Address_components> address_componentsList = locationModel.getResultsList().get(0).getAddress_components();
+                            for (Address_components address : address_componentsList) {
+                                for (String type : address.getTypes()) {
+                                    if (type.equalsIgnoreCase("locality")) {
+                                        city = address.getLong_name();
+                                        Logger.d("citySelected", city);
+                                    }
+                                }
+                            }
+                            if (!city.isEmpty())
+                                preferenceManager.setCity(city);
+                            //TODO decide how to call the api all over again with new city
+                        }
+                    });
+    }
+
+
 }

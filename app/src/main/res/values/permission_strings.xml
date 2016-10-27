@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_rationale">Camera permission is needed to show the camera preview and capture image</string>
+    <string name="storage_unavailable">Access to external storage is denied. Please enable storage permission</string>
+    <string name="storage_rationale">External storage permission is needed to access your pictures to upload as profile picture</string>
+    <string name="accounts_rationale">You need to grant access to account manger , we use this to help auto suggest Email accounts</string>
+    <string name="call_rationale">Call permission is needed to initiate a phone call without going through the dialer user interface for you to confirm the call</string>
+    <string name="call_unavailable">Permission Denied. Call permission is needed to initiate a phone call</string>
+    <string name="sms_rationale">You need to grant access to Read SMS for auto reading OTP</string>
+    <string name="location_rationale">Location permission is needed to get your store information and its location.</string>
+    <string name="location_unavailable">Permission Denied. Location permission is needed to setup the store.</string>
+    <string name="read_contacts_rationale">Read contacts permission is needed to get your contacts.</string>
+    <string name="write_contacts_rationale">Write contacts permission is needed to get your contacts.</string>
+</resources>

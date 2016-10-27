@@ -2,6 +2,7 @@ package techgravy.sunshine;
 
 import android.app.Application;
 
+import com.karumi.dexter.Dexter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class MainApplication extends Application {
     }
 
     private void init() {
+        Dexter.initialize(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new LoggerTree());
             Timber.tag("Sunshine");
