@@ -29,7 +29,7 @@ public class WeekRVAdapter extends RecyclerView.Adapter<WeekRVAdapter.WeatherVie
     String unit, iconPack;
     private WeatherClickInterface weatherClickInterface;
 
-    public WeekRVAdapter(Context context, List<WeatherForecastModel> forecastList, String unit, String iconPack, WeatherClickInterface weatherClickInterface) {
+    WeekRVAdapter(Context context, List<WeatherForecastModel> forecastList, String unit, String iconPack, WeatherClickInterface weatherClickInterface) {
         this.forecastList = forecastList;
         if (forecastList.size() > 0)
             Timber.tag("AdapterNPE").d(forecastList.toString());
@@ -52,8 +52,13 @@ public class WeekRVAdapter extends RecyclerView.Adapter<WeekRVAdapter.WeatherVie
         Timber.d(forecast.toString());
         holder.listItemDateTextview.setText(CommonUtils.formatWeekDays(forecast.getDt()));
         holder.listItemForecastTextview.setText(CommonUtils.getStringForWeatherCondition(context, forecast.getWeather().get(0).getmId()));
-        holder.listItemHighTextview.setText(CommonUtils.formatTemperature(context, forecast.getTemp().getMax(), unit));
-        holder.listItemLowTextview.setText(CommonUtils.formatTemperature(context, forecast.getTemp().getMin(), unit));
+        if (forecast.getTemp() != null) {
+            holder.listItemHighTextview.setText(CommonUtils.formatTemperature(context, forecast.getTemp().getMax(), unit));
+            holder.listItemLowTextview.setText(CommonUtils.formatTemperature(context, forecast.getTemp().getMin(), unit));
+        } else {
+            holder.listItemHighTextview.setText("-");
+            holder.listItemLowTextview.setText("-");
+        }
         holder.listItemIcon.setImageDrawable(CommonUtils.getWeatherIconFromWeather(context, forecast.getWeather().get(0).getmId(), iconPack));
         holder.itemView.setTag(forecast);
         runEnterAnimation(holder.itemView);

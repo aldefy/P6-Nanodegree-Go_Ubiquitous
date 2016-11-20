@@ -9,11 +9,13 @@ import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushCallback;
 import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.annotations.RushList;
+import co.uk.rushorm.core.annotations.RushTableAnnotation;
 
 
 /**
  * Created by aditlal on 06/04/16.
  */
+@RushTableAnnotation
 public class WeatherForecastModel implements Serializable, Rush {
 
 
@@ -40,7 +42,7 @@ public class WeatherForecastModel implements Serializable, Rush {
     private ArrayList<Weather> weather;
 
     @SerializedName("temp")
-    private Temperature temp;
+    private Temperature temperature;
 
     public WeatherForecastModel() {
     }
@@ -86,11 +88,11 @@ public class WeatherForecastModel implements Serializable, Rush {
     }
 
     public Temperature getTemp() {
-        return temp;
+        return temperature;
     }
 
     public void setTemp(Temperature temp) {
-        this.temp = temp;
+        this.temperature = temp;
     }
 
     public float getClouds() {
@@ -112,51 +114,9 @@ public class WeatherForecastModel implements Serializable, Rush {
 
     @Override
     public String toString() {
-        return "ClassPojo [clouds = " + clouds + ", dt = " + dt + ", humidity = " + humidity + ", pressure = " + pressure + ", speed = " + speed + ", deg = " + deg + ", weather = " + weather + ", temp = " + temp + "]";
+        return "ClassPojo [clouds = " + clouds + ", dt = " + dt + ", humidity = " + humidity + ", pressure = " + pressure + ", speed = " + speed + ", deg = " + deg + ", weather = " + weather + ", temp = " + temperature + "]";
     }
 
-
- /*   @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeFloat(clouds);
-        dest.writeString(dt);
-        dest.writeFloat(humidity);
-        dest.writeFloat(pressure);
-        dest.writeFloat(speed);
-        dest.writeFloat(deg);
-        dest.writeList(weather);
-        dest.writeParcelable(temp, flags);
-    }
-
-    // Creator
-    public static final Parcelable.Creator<WeatherForecastModel> CREATOR
-            = new Parcelable.Creator<WeatherForecastModel>() {
-        public WeatherForecastModel createFromParcel(Parcel in) {
-            return new WeatherForecastModel(in);
-        }
-
-        public WeatherForecastModel[] newArray(int size) {
-            return new WeatherForecastModel[size];
-        }
-    };
-
-    // "De-parcel object
-    public WeatherForecastModel(Parcel in) {
-        clouds = in.readFloat();
-        dt = in.readString();
-        humidity = in.readFloat();
-        pressure = in.readFloat();
-        speed = in.readFloat();
-        deg = in.readFloat();
-        List<Weather> myList = null;
-        in.readList(myList, List.class.getClassLoader());
-        weather = myList;
-    }*/
 
     @Override
     public void save() {

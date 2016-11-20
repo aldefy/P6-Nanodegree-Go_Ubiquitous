@@ -64,7 +64,7 @@
             android:value="1"/>
         <meta-data
             android:name="Rush_db_name"
-            android:value="sunshine.db"/>
+            android:value="weather_sunshine.db"/>
         <meta-data
             android:name="Rush_debug"
             android:value="true"/>

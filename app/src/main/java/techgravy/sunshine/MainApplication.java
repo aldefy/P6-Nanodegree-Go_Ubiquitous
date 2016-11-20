@@ -26,13 +26,7 @@ import techgravy.sunshine.utils.LoggerTree;
 import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
 
-/**
- * Created by aditlal on 04/04/16.
- */
-/*@ReportsCrashes(mailTo = "aditlal90@gmail.com",
-        customReportContent = {ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME, ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, ReportField.CUSTOM_DATA, ReportField.STACK_TRACE, ReportField.LOGCAT},
-        mode = ReportingInteractionMode.TOAST,
-        resToastText = R.string.crash_toast_text)*/
+
 public class MainApplication extends Application {
 
 
@@ -50,6 +44,7 @@ public class MainApplication extends Application {
 
     private void init() {
         Dexter.initialize(this);
+        initializeDB();
         if (BuildConfig.DEBUG) {
             Timber.plant(new LoggerTree());
             Timber.tag("Sunshine");
@@ -65,7 +60,6 @@ public class MainApplication extends Application {
         Picasso built = builder.build();
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
-        initializeDB();
     }
 
     private void initializeDB() {

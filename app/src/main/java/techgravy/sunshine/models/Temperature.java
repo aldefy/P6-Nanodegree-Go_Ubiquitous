@@ -7,12 +7,15 @@ import java.io.Serializable;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushCallback;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.annotations.RushCustomTableName;
+import techgravy.sunshine.utils.logger.Logger;
 
 
 /**
  * Created by aditlal on 13/04/16.
  */
-public class Temperature implements  Serializable ,Rush {
+@RushCustomTableName(name = "Temperature")
+public class Temperature implements Serializable, Rush {
     @SerializedName("min")
     private float min;
     @SerializedName("eve")
@@ -80,13 +83,28 @@ public class Temperature implements  Serializable ,Rush {
     }
 
     @Override
-    public void save() { RushCore.getInstance().save(this); }
+    public void save() {
+        RushCore.getInstance().save(this);
+        Logger.t("rushSaved").d("saved temp " + toString());
+    }
+
     @Override
-    public void save(RushCallback callback) { RushCore.getInstance().save(this, callback); }
+    public void save(RushCallback callback) {
+        RushCore.getInstance().save(this, callback);
+    }
+
     @Override
-    public void delete() { RushCore.getInstance().delete(this); }
+    public void delete() {
+        RushCore.getInstance().delete(this);
+    }
+
     @Override
-    public void delete(RushCallback callback) { RushCore.getInstance().delete(this, callback); }
+    public void delete(RushCallback callback) {
+        RushCore.getInstance().delete(this, callback);
+    }
+
     @Override
-    public String getId() { return RushCore.getInstance().getId(this); }
+    public String getId() {
+        return RushCore.getInstance().getId(this);
+    }
 }
