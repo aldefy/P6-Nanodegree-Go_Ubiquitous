@@ -1,8 +1,11 @@
 package techgravy.sunshine.utils;
 
+import com.google.android.gms.wearable.Asset;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.annotation.ColorInt;
@@ -22,9 +25,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 import techgravy.sunshine.R;
+import techgravy.sunshine.utils.logger.Logger;
 import timber.log.Timber;
 
 /**
@@ -54,8 +59,8 @@ public class CommonUtils {
     }
 
     /**
-     * Helper method to provide the string according to the weather
-     * condition id returned by the OpenWeatherMap call.
+     * Helper method to provide the string according to the weather condition id returned by the
+     * OpenWeatherMap call.
      *
      * @param context   Android context
      * @param weatherId from OpenWeatherMap API response
@@ -257,6 +262,17 @@ public class CommonUtils {
                         .color(ContextCompat.getColor(context, R.color.white))
                         .sizeDp(24);
         }
+    }
+
+    public static Asset getWeatherAsset(Context context, int weatherId, String iconPack) {
+        Logger.t("getWeatherAsset").d(weatherId + "");    IconicsDrawable drawable = getWeatherIconFromWeather(context, weatherId, iconPack);
+        Bitmap bitmap = drawable.toBitmap();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        //  Bitmap bitmap1=bitmap.copy(Bitmap.Config.ARGB_8888,true);
+        //set PNG the image otherwise shows a black background
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+
+        return Asset.createFromBytes(byteArrayOutputStream.toByteArray());
     }
 
     private static IconicsDrawable getDefaultIcons(Context context, int weatherId) {

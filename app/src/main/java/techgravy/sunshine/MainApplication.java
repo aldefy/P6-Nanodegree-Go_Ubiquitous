@@ -22,7 +22,7 @@ import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.module.PrefModule;
-import techgravy.sunshine.utils.LoggerTree;
+import techgravy.sunshine.utils.logger.LoggerTree;
 import techgravy.sunshine.utils.PreferenceManager;
 import timber.log.Timber;
 

@@ -4,14 +4,9 @@ package techgravy.sunshine.sync;
  * Created by aditlal on 24/09/16.
  */
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -19,6 +14,13 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import techgravy.sunshine.utils.CommonUtils;
 import techgravy.sunshine.utils.PreferenceManager;
 import techgravy.sunshine.utils.logger.Logger;
 
@@ -60,9 +62,11 @@ public class WearableDataService extends WearableListenerService
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "onConnected");
         if (!tempH.isEmpty() && !tempL.isEmpty() && weatherId != 0) {
+            Asset asset = CommonUtils.getWeatherAsset(context,weatherId,preferenceManager.getIconPack());
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_DATA_PATH);
             putDataMapRequest.setUrgent();
             putDataMapRequest.getDataMap().putInt("weatherId", weatherId);
+            putDataMapRequest.getDataMap().putAsset("weather-image",asset);
             putDataMapRequest.getDataMap().putString("max-temp", tempH);
             putDataMapRequest.getDataMap().putString("min-temp", tempL);
             putDataMapRequest.getDataMap().putString("location", "");

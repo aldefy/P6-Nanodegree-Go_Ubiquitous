@@ -1,9 +1,7 @@
-package techgravy.sunshine.utils;
+package techgravy.sunshine.utils.logger;
 
 import android.util.Log;
 
-import techgravy.sunshine.utils.logger.LogLevel;
-import techgravy.sunshine.utils.logger.Logger;
 import timber.log.Timber;
 
 /**
@@ -13,8 +11,6 @@ public class LoggerTree extends Timber.Tree {
 
     public LoggerTree() {
         Logger.init("Sunshine")
-                .methodCount(4)
-                .hideThreadInfo()
                 .logLevel(LogLevel.FULL);
 
     }
