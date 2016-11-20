@@ -1,9 +1,14 @@
 package techgravy.sunshine.ui.main;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +22,7 @@ import java.util.List;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushSearch;
 import rx.Observable;
 import rx.Subscriber;
@@ -28,10 +34,12 @@ import techgravy.sunshine.api.ForecastApiGenerator;
 import techgravy.sunshine.api.GetForecastApi;
 import techgravy.sunshine.interfaces.WeatherClickInterface;
 import techgravy.sunshine.interfaces.WeatherDetailInterface;
+import techgravy.sunshine.models.Temperature;
 import techgravy.sunshine.models.WeatherForecastModel;
 import techgravy.sunshine.models.WeatherHeaderModel;
 import techgravy.sunshine.models.WeatherResponse;
 import techgravy.sunshine.utils.CommonUtils;
+import techgravy.sunshine.utils.ConnectivityUtil;
 import techgravy.sunshine.utils.PreferenceManager;
 import techgravy.sunshine.utils.VerticalSpaceItemDecoration;
 import timber.log.Timber;
@@ -42,6 +50,7 @@ import static techgravy.sunshine.BuildConfig.API_KEY;
  * Created by aditlal on 12/04/16.
  */
 public class WeatherFragment extends Fragment implements WeatherClickInterface {
+    private static final int WEATHER_NOTIFICATION_ID = 1040;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     PreferenceManager preferenceManager;
@@ -107,13 +116,23 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
         //fetchWeatherFromServer();
 
         // fetchWeatherFromServer();
-        callDBFirst();
+        if (!ConnectivityUtil.isConnected(getActivity()))
+            callDBFirst();
+        else
+            fetchWeatherFromServer();
         checkAdapterIsEmpty(forecastEmpty);
     }
 
     private void callDBFirst() {
         Timber.tag("Flows").d("callDBFirst");
         List<WeatherResponse> list = new RushSearch().find(WeatherResponse.class);
+        List<Temperature> temperatureList = new RushSearch().find(Temperature.class);
+        Timber.tag("TempDB").d(temperatureList.toString() + "");
+       /* WeatherResponse response = list.get(0);
+        for (WeatherForecastModel model : response.getList()) {
+            if (temperatureList != null && temperatureList.size() >= 1)
+                model.setTemp(temperatureList.get(0));
+        }*/
         getActivity().runOnUiThread(() -> {
             if (list != null) {
                 if (list.size() > 0) {
@@ -158,6 +177,7 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
             @Override
             public void onNext(WeatherResponse weatherResponse) {
                 Timber.tag("Flows").d("initSubscriber");
+
                 forecastList.clear();
                 forecastList.addAll(weatherResponse.getList());
                 adapter.notifyDataSetChanged();
@@ -179,6 +199,40 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                     model.setTemp(weatherResponse.getList().get(0).getTemp().getMax());
                 model.setWeatherId(weatherResponse.getList().get(0).getWeather().get(0).getmId());
                 model.setWeatherCondition(CommonUtils.getStringForWeatherCondition(getActivity(), weatherResponse.getList().get(0).getWeather().get(0).getmId()));
+
+                if (weatherResponse.getList().get(0).getTemp() != null) {
+                    String contentText =   String.format(getString(R.string.format_notification),
+                            CommonUtils.getStringForWeatherCondition(getActivity(), weatherResponse.getList().get(0).getWeather().get(0).getmId()),
+                            CommonUtils.formatTemperature(getActivity(), weatherResponse.getList().get(0).getTemp().getMax(), preferenceManager.getUnit()),
+                            CommonUtils.formatTemperature(getActivity(), weatherResponse.getList().get(0).getTemp().getMin(), preferenceManager.getUnit()));
+                    NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(getActivity())
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setContentTitle("Bangalore")
+                                    .setContentText(contentText);
+
+                    // Make something interesting happen when the user clicks on the notification.
+                    // In this case, opening the app is sufficient.
+                    Intent resultIntent = new Intent(getActivity(), MainActivity.class);
+
+                    // The stack builder object will contain an artificial back stack for the
+                    // started Activity.
+                    // This ensures that navigating backward from the Activity leads out of
+                    // your application to the Home screen.
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
+                    stackBuilder.addNextIntent(resultIntent);
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+                    mBuilder.setContentIntent(resultPendingIntent);
+
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    // WEATHER_NOTIFICATION_ID allows you to update the notification later on.
+                    mNotificationManager.notify(WEATHER_NOTIFICATION_ID, mBuilder.build());
+                }
                 Timber.tag("Headersubscriber").d(model.toString());
 
                  /*   Observable<WeatherHeaderModel> quotaObservable = Observable.create(
@@ -220,9 +274,10 @@ public class WeatherFragment extends Fragment implements WeatherClickInterface {
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(weatherResponse -> {
                     Timber.tag("Flows").d("fetchWeatherFromServer");
+                    RushCore.getInstance().clearDatabase();
                     weatherResponse.save(() -> Timber.tag("rushSaved").d("weatherResponse = " + weatherResponse.toString()));
-                    for (WeatherForecastModel model : weatherResponse.getList())
-                        model.save(() -> Timber.tag("rushSaved").d("weatherForecast = " + model.toString()));
+                 /*   for (WeatherForecastModel model : weatherResponse.getList())
+                        model.save(() -> Timber.tag("rushSaved").d("weatherForecast = " + model.toString()));*/
                     return weatherResponse;
                 })
                 .subscribe(weatherResponseSubscriber);

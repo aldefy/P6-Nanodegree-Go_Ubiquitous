@@ -50,6 +50,7 @@ public class MainApplication extends Application {
 
     private void init() {
         Dexter.initialize(this);
+        initializeDB();
         if (BuildConfig.DEBUG) {
             Timber.plant(new LoggerTree());
             Timber.tag("Sunshine");
@@ -65,7 +66,6 @@ public class MainApplication extends Application {
         Picasso built = builder.build();
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
-        initializeDB();
     }
 
     private void initializeDB() {

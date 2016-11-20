@@ -8,7 +8,7 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                   android:layout_marginTop="8dp"
                     android:orientation="vertical">
 
         <TextView
@@ -101,53 +101,6 @@
             android:layout_below="@+id/weather_settings_option2"
             android:background="@color/grey_500"/>
 
-        <RelativeLayout android:id="@+id/weather_settings_option3"
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/divider2"
-                        android:background="?android:selectableItemBackground"
-                        android:clickable="true"
-                        android:paddingBottom="16dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="2dp"
-                        android:paddingTop="16dp">
-
-
-            <TextView
-                android:id="@+id/weather_location_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toStartOf="@+id/gpsLocationButton"
-                android:text="@string/weather_location_heading"
-                android:textColor="@color/white"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:id="@+id/weather_location_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/weather_location_heading"
-                android:layout_toStartOf="@+id/gpsLocationButton"
-                android:paddingTop="4dp"
-                android:text="@string/value_location_metric"
-                android:textColor="@color/white"
-                android:textSize="16sp"/>
-
-            <ImageButton
-                android:id="@+id/gpsLocationButton"
-                android:layout_width="56dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
-                android:background="@color/transparent"
-                android:clickable="false"
-                android:contentDescription="@string/myLocation_gps"
-                android:padding="8dp"
-                android:src="@drawable/ic_my_location"/>
-
-        </RelativeLayout>
-
         <View
             android:id="@+id/divider3"
             android:layout_width="match_parent"
@@ -236,6 +189,54 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/grey_500"/>
+
+        <RelativeLayout android:id="@+id/weather_settings_option3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:paddingBottom="16dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="2dp"
+                        android:paddingTop="16dp"
+                        android:visibility="gone"
+                        android:layout_below="@+id/divider2"
+                        android:layout_alignParentStart="true">
+
+
+            <TextView
+                android:id="@+id/weather_location_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/gpsLocationButton"
+                android:text="@string/weather_location_heading"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/weather_location_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weather_location_heading"
+                android:layout_toStartOf="@+id/gpsLocationButton"
+                android:paddingTop="4dp"
+                android:text="@string/value_location_metric"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
+
+            <ImageButton
+                android:id="@+id/gpsLocationButton"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:background="@color/transparent"
+                android:clickable="false"
+                android:contentDescription="@string/myLocation_gps"
+                android:padding="8dp"
+                android:src="@drawable/ic_my_location"/>
+
+        </RelativeLayout>
     </RelativeLayout>
 
 

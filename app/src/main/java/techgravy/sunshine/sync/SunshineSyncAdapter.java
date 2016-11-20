@@ -61,7 +61,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         getForecastApi.getWeekForecast("bangalore", "json", "metric", "14", API_KEY).subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .map(weatherResponse -> {
-                    weatherResponse.save(() -> Timber.tag("rushSaved").d("Saved api sync data " + weatherResponse.hashCode()));
+                   // weatherResponse.save(() -> Timber.tag("rushSaved").d("Saved api sync data " + weatherResponse.hashCode()));
                     WeatherHeaderModel model = new WeatherHeaderModel();
                     model.setCity(weatherResponse.getCity().getName());
                     model.setHumidity(context.getString(R.string.format_humidity, weatherResponse.getList().get(0).getHumidity()));
